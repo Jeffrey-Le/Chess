@@ -11,7 +11,7 @@
 
 class Piece {
     protected:
-        uint64_t pieceBoard;
+        uint64_t *pieceBoard;
         int value;
         sf::Image texture;
     public:

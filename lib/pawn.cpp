@@ -7,9 +7,10 @@
 Pawn::Pawn() {
     this->value = 1;
 
-    this->pieceBoard = new uint64_t(0x0000000000000004);
+    //this->pieceBoard = new uint64_t(0x0000000000000004);
+    this->pieceBoard = new uint64_t(4);
 }
-
-void Pawn::displayBoard() {
-    std::cout << *this->pieceBoard << "\n";
-}
+//
+//void Pawn::displayBoard() {
+//    std::cout << *this->pieceBoard << "\n";
+//}

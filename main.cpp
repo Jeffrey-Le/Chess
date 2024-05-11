@@ -10,9 +10,13 @@ int main()
 {
     std::cout << "Hello, World!" << std::endl;
 
-    Pawn test;
+    Game test;
 
-    test.displayBoard();
+    test.openGame();
+
+    Pawn test2;
+
+    test2.displayBoard();
 
     return 0;
 

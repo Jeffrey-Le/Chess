@@ -6,6 +6,19 @@
 
 Game::Game() {
     this->window.create(sf::VideoMode(640, 480), "SFML Application");
+
+    this->square = new Square[64];
+
+    for (int i = 0; i < 64; i++) {
+        if (i % 2 == 0)
+            this->square[i].setColor(sf::Color(255, 255, 255));
+        else
+            this->square[i].setColor(sf::Color(0, 0, 0));
+    }
+}
+
+Game::~Game() {
+    delete [] this->square;
 }
 
 void Game::openGame() {
@@ -16,6 +29,35 @@ void Game::openGame() {
     shape.setRadius(40.f);
     shape.setPosition(100.f, 100.f);
     shape.setFillColor(sf::Color::Cyan);
+
+    bool altRow = false;
+
+    // Set Square Variables
+    for (int i = 1; i < 64; i++)
+    {
+        float oldX = this->square[i-1].usePos().x;
+        float oldY = this->square[i-1].usePos().y;
+
+        if (i % 16 == 8)
+        {
+            altRow = true;
+            oldX += 50.0f;
+        }
+
+        if (i % 16 == 0)
+        {
+            altRow = false;
+            oldX -= 50.0f;
+        }
+
+        if (i % 8 == 0)
+            oldY += 50.0f;
+
+        if (altRow)
+            oldX *= -1;
+
+        this->square[i].setPos(abs((oldX + 50.0f)), oldY);
+    }
 
     while (this->window.isOpen())
     {
@@ -28,11 +70,13 @@ void Game::openGame() {
                 this->window.close();
         }
 
-        this->window.clear(); // Clears Canvas
+        this->window.clear(sf::Color(sf::Color(0, 255, 0))); // Clears Canvas
 
         // Draw Content
-        this->window.draw(shape);
+        for (int i = 0; i < 64; i++)
+            this->window.draw(this->square[i].useSquare());
 
         this->window.display(); // Displays
     }
 }
+

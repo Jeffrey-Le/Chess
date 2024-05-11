@@ -8,11 +8,15 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include "square.h"
+
 class Game {
     private:
         sf::RenderWindow window;
+        Square *square;
     public:
         Game();
+        ~Game();
         void openGame();
 };
 

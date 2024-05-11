@@ -9,11 +9,9 @@
 
 class Pawn : public Piece {
     private:
-        uint64_t *pieceBoard;
     public:
         Pawn();
 
-        virtual void displayBoard();
 };
 
 #endif //CHESS_PAWN_H

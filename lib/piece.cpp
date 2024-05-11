@@ -18,5 +18,5 @@ void Piece::setTexture(sf::Image) {
 }
 
 void Piece::displayBoard() {
-    std::cout << this->pieceBoard << "\n";
+    std::cout << *this->pieceBoard << "\n";
 }
