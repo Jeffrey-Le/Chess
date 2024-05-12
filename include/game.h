@@ -9,11 +9,12 @@
 #include <SFML/Graphics.hpp>
 
 #include "square.h"
+#include "board.h"
 
 class Game {
     private:
         sf::RenderWindow window;
-        Square *square;
+        Board *board;
     public:
         Game();
         ~Game();

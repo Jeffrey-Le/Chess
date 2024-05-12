@@ -19,7 +19,6 @@ int main()
     test2.displayBoard();
 
     return 0;
-
 }
 
 // set(CMAKE_CXX_STANDARD 20)
