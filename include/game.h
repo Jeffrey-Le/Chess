@@ -15,6 +15,7 @@ class Game {
     private:
         sf::RenderWindow window;
         Board *board;
+
     public:
         Game();
         ~Game();

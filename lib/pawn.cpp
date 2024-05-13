@@ -7,10 +7,23 @@
 Pawn::Pawn() {
     this->value = 1;
 
-    //this->pieceBoard = new uint64_t(0x0000000000000004);
-    this->pieceBoard = new uint64_t(4);
+    this->texture.loadFromFile("../res/blackKing.svg");
+
+    this->pieceBoard = new uint64_t(0x00ff000000000000);
 }
-//
-//void Pawn::displayBoard() {
-//    std::cout << *this->pieceBoard << "\n";
-//}
+
+Pawn::Pawn(char color) {
+    this->value = 1;
+
+    if (color == 'w')
+    {
+        this->pieceBoard = new uint64_t(0x00ff000000000000);
+        return;
+        }
+    if (color == 'b') {
+        this->pieceBoard = new uint64_t(0x000000000000ff00);
+        return;
+    }
+
+    this->pieceBoard = new uint64_t(0);
+}

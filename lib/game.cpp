@@ -5,9 +5,10 @@
 #include "../include/game.h"
 
 Game::Game() {
-    this->window.create(sf::VideoMode(640, 480), "SFML Application");
+    this->window.create(sf::VideoMode(960, 720), "SFML Application");
 
     this->board = new Board(); // Create a new board
+
 }
 
 Game::~Game() {
@@ -25,6 +26,14 @@ void Game::openGame() {
 
     this->board->drawBoard(); // Setup square board elements
 
+    sf::Texture texture;
+
+    texture.loadFromFile("../res/blackKing.png");
+
+
+    sf::Sprite testObj;
+
+    testObj.setTexture(texture);
 
     while (this->window.isOpen())
     {
@@ -39,11 +48,17 @@ void Game::openGame() {
 
         this->window.clear(sf::Color(sf::Color(0, 255, 0))); // Clears Canvas
 
-        // Draw Content onto Window
+//        // Draw Content onto Window
 //        for (int i = 0; i < 64; i++)
 //            this->window.draw(this->board->useBoard()[i].useSquare());
+//
+//        for (int i = 0; i < 8; i++)
+//        {
+//            this->window.draw(this->board->usePositions('n')[i]);
+//            this->window.draw(this->board->usePositions('l')[i]);
+//        }
 
-        this->window.draw(this->board->usePositions()[1]);
+        this->window.draw(testObj);
 
         this->window.display(); // Display
     }

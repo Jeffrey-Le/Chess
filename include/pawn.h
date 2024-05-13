@@ -11,6 +11,7 @@ class Pawn : public Piece {
     private:
     public:
         Pawn();
+        Pawn(char);
 
 };
 

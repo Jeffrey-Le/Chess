@@ -16,10 +16,13 @@ class Piece {
         sf::Image texture;
     public:
         Piece();
+        Piece(uint64_t*);
 
         void setValue(int);
 
         void setTexture(sf::Image);
+
+        void setBitBoard(uint64_t*);
 
         void displayBoard();
 };

@@ -20,6 +20,9 @@ class Board {
 
         Square *square;
 
+
+        sf::Font font;
+
         sf::Text *numPositions;
         sf::Text *letterPositions;
     public:
@@ -34,7 +37,7 @@ class Board {
 
         Square *useBoard();
 
-        sf::Text *usePositions();
+        sf::Text *usePositions(char);
 };
 
 #endif //CHESS_BOARD_H

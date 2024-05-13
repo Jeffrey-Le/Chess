@@ -9,12 +9,21 @@ Piece::Piece() {
 
 }
 
-void Piece::setValue(int) {
-
+Piece::Piece(uint64_t *bitBoard) {
+    this->pieceBoard = bitBoard;
 }
 
-void Piece::setTexture(sf::Image) {
 
+void Piece::setValue(int newValue) {
+    this->value = newValue;
+}
+
+void Piece::setTexture(sf::Image newTexture) {
+    this->texture = newTexture;
+}
+
+void Piece::setBitBoard(uint64_t *newBitBoard) {
+    this->pieceBoard = newBitBoard;
 }
 
 void Piece::displayBoard() {
