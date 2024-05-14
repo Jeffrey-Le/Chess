@@ -36,4 +36,16 @@ sf::RectangleShape Square::useSquare() {
     return *this->squareSpace;
 }
 
+bool Square::useClicked() {
+    return this->squareClicked;
+}
+
+bool Square::isClicked(sf::RenderWindow &window) {
+
+    sf::Vector2i coords = sf::Mouse::getPosition(window);
+
+    if (this->squareSpace->getGlobalBounds().contains(coords.x, coords.y)) {
+        return true;
+    }
+}
 

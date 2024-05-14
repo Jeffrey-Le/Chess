@@ -13,16 +13,22 @@ class Piece {
     protected:
         uint64_t *pieceBoard;
         int value;
-        sf::Image texture;
+        sf::Texture texture;
+        sf::Sprite sprite;
     public:
         Piece();
         Piece(uint64_t*);
+        ~Piece();
 
         void setValue(int);
 
-        void setTexture(sf::Image);
+        void setTexture(sf::Texture);
+
+        void setTexture(std::string);
 
         void setBitBoard(uint64_t*);
+
+        sf::Sprite useSprite();
 
         void displayBoard();
 };

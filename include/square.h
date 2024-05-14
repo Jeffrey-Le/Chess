@@ -12,6 +12,8 @@ class Square {
     private:
         int piece = 0;
         sf::RectangleShape *squareSpace;
+
+        bool squareClicked = false;
     public:
         Square();
 
@@ -23,6 +25,9 @@ class Square {
 
         sf::Vector2f usePos();
         sf::RectangleShape useSquare();
+        bool useClicked();
+
+        bool isClicked(sf::RenderWindow &);
 };
 
 #endif //CHESS_SQUARE_H
