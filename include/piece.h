@@ -11,8 +11,10 @@
 
 class Piece {
     protected:
-        uint64_t *pieceBoard;
-        int value;
+        uint64_t *pieceBoard; // How to track piece on Board
+
+        int value; // How to track piece in Classes
+
         sf::Texture texture;
         sf::Sprite sprite;
     public:

@@ -24,7 +24,13 @@ void Game::openGame() {
 
     Square *squares = this->board->useBoard();
 
-    int clickedSquareIndex = 0;
+    squares[8].changePiece(1.0f);
+    squares[9].changePiece(1.0f);
+  //  squares[10].changePiece(1.0f);
+
+    Bitboard *testBoard = new Bitboard(squares);
+
+    testBoard->displayBitboard();
 
     while (this->window.isOpen())
     {
@@ -59,10 +65,11 @@ void Game::openGame() {
                 {
                     for (int i = 0 ; i < 64; i++)
                     {
-                        bool test = squares[i].isClicked(this->window);
-
-                        if (test)
+                        if (squares[i].isClicked(this->window)) {
                             std::cout << i << std::endl;
+                            // Display Blue Squares
+                            squares[i].checkPiece();
+                        }
                     }
                 }
             }

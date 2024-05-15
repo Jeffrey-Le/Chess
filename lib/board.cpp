@@ -98,8 +98,6 @@ void Board::drawBoard() {
     float lastSqX = this->square[63].usePos().x;
     float lastSqY = this->square[63].usePos().y;
 
-    std::cout << lastSqY << std::endl;
-
     this->numPositions[0].setPosition(lastSqX+15.0f, lastSqY + 50.0f);
     this->letterPositions[0].setPosition(lastSqX - 25.0f, lastSqY);
 

@@ -10,6 +10,7 @@
 
 #include "square.h"
 #include "board.h"
+#include "Bitboard.h"
 
 class Game {
     private:

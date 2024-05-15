@@ -10,22 +10,23 @@
 
 class Square {
     private:
-        int piece = 0;
+        float piece = 0;
         sf::RectangleShape *squareSpace;
-
-        bool squareClicked = false;
     public:
         Square();
+        Square(float);
+        ~Square();
 
         void echoPiece();
-        void changePiece(int);
+        void changePiece(float);
+        void checkPiece();
 
         void setColor(sf::Color);
         void setPos(float, float);
 
         sf::Vector2f usePos();
         sf::RectangleShape useSquare();
-        bool useClicked();
+        float usePiece();
 
         bool isClicked(sf::RenderWindow &);
 };

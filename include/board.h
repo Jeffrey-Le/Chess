@@ -11,10 +11,13 @@
 #include <iomanip>
 
 #include "square.h"
+#include "Bitboard.h"
 
 class Board {
     private:
         uint64_t *board;
+
+        Bitboard *bitboard;
 
         uint64_t fullInt(uint64_t);
 
