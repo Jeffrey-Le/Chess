@@ -3,12 +3,12 @@
 //
 #include "../include/Bitboard.h"
 
-//Bitboard::Bitboard() {
-//    this->board = new uint64_t(0);
-//}
+Bitboard::Bitboard() {
+    this->board = 0ULL;
+}
 
 Bitboard::Bitboard(Square *squares) {
-    this->board = 0x0000000000000000000000000000000000000000000000000000000000000000;
+    this->board = 0ULL;
 
     std::cout << "In Bitboard: " << this->board << std::endl;
 
@@ -23,7 +23,7 @@ Bitboard::Bitboard(Square *squares) {
         switch (int64_t(floor(pieceVal))) {
             case 1:
                 std::cout << "1" << std::endl;
-                this->board += this->convertToBitBoard(Binary);
+                this->board  += this->convertToBitBoard(Binary);
                 break;
             case -1:
                 std::cout << "-1" << std::endl;
@@ -68,7 +68,7 @@ Bitboard::Bitboard(Square *squares) {
         }
 
     }
-
+    std::cout << Binary << std::endl;
 }
 
 Bitboard::~Bitboard() {
@@ -76,12 +76,13 @@ Bitboard::~Bitboard() {
 }
 
 uint64_t  Bitboard::convertToBitBoard(std::string Binary) {
+    size_t offset = 0;
     if (Binary.at(0) == '0')
-        return std::stoull(Binary, nullptr, 2);
+        return std::stoull(Binary, &offset, 2);
     else
-        return std::stoull("1"+Binary.substr(2), nullptr, 2)*2;
+        return std::stoull("1"+Binary.substr(2), &offset, 2)*2;
 }
 
 void Bitboard::displayBitboard() {
-    std::cout << this->board << std::endl;
+    std::cout << uint64_t(this->board) << std::endl;
 }

@@ -24,10 +24,6 @@ void Game::openGame() {
 
     Square *squares = this->board->useBoard();
 
-    squares[8].changePiece(1.0f);
-    squares[9].changePiece(1.0f);
-  //  squares[10].changePiece(1.0f);
-
     Bitboard *testBoard = new Bitboard(squares);
 
     testBoard->displayBitboard();

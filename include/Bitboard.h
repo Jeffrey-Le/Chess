@@ -14,8 +14,8 @@ class Bitboard {
         uint64_t board;
         uint64_t convertToBitBoard(std::string);
     public:
-        //Bitboard();
-        explicit Bitboard(Square *);
+        Bitboard();
+        Bitboard(Square *);
         ~Bitboard();
 
         void displayBitboard();
