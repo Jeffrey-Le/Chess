@@ -2,7 +2,7 @@
 // Created by Jeffrey Vo Le on 5/11/24.
 //
 
-#include "../include/pawn.h"
+#include "../include/Pawn.h"
 
 Pawn::Pawn() {
     this->value = 1;

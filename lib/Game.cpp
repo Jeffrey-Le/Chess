@@ -2,7 +2,7 @@
 // Created by Jeffrey Vo Le on 5/10/24.
 //
 
-#include "../include/game.h"
+#include "../include/Game.h"
 
 Game::Game() {
     this->window.create(sf::VideoMode(960, 720), "SFML Application");
@@ -22,11 +22,13 @@ void Game::openGame() {
     // Draw Variables
     this->board->drawBoard(); // Setup square board elements
 
+    this->board->startGame();
+
+    //this->board->displayBoard();
+
+    GameLogic *test = new GameLogic(*this->board);
+
     Square *squares = this->board->useBoard();
-
-    Bitboard *testBoard = new Bitboard(squares);
-
-    testBoard->displayBitboard();
 
     while (this->window.isOpen())
     {

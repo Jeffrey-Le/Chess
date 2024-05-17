@@ -10,14 +10,12 @@
 #include <cstdint>
 #include <iomanip>
 
-#include "square.h"
+#include "Square.h"
 #include "Bitboard.h"
 
 class Board {
     private:
-        uint64_t *board;
-
-        Bitboard *bitboard;
+        Bitboard *board;
 
         uint64_t fullInt(uint64_t);
 
@@ -32,9 +30,13 @@ class Board {
         Board();
         ~Board();
 
-        void updateBoard(uint64_t*);
+        void updateBoard(Bitboard *);
+
+        void setSquares(Square *);
 
         void displayBoard();
+
+        void startGame();
 
         void drawBoard();
 

@@ -8,9 +8,10 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "square.h"
-#include "board.h"
+#include "Square.h"
+#include "Board.h"
 #include "Bitboard.h"
+#include "GameLogic.h"
 
 class Game {
     private:

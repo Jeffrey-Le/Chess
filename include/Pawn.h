@@ -5,7 +5,7 @@
 #ifndef CHESS_PAWN_H
 #define CHESS_PAWN_H
 
-#include "piece.h"
+#include "Piece.h"
 
 class Pawn : public Piece {
     private:

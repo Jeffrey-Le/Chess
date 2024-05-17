@@ -2,7 +2,7 @@
 // Created by Jeffrey Vo Le on 5/10/24.
 //
 
-#include "../include/piece.h"
+#include "../include/Piece.h"
 
 
 Piece::Piece() {

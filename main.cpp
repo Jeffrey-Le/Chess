@@ -1,10 +1,10 @@
 #include <iostream>
 #include <cstdint>
 #include <SFML/Graphics.hpp>
-#include "include/square.h"
-#include "include/game.h"
-#include "include/board.h"
-#include "include/pawn.h"
+#include "include/Square.h"
+#include "include/Game.h"
+#include "include/Board.h"
+#include "include/Pawn.h"
 
 int main()
 {

@@ -2,7 +2,7 @@
 // Created by Jeffrey Vo Le on 5/10/24.
 //
 
-#include "../include/square.h"
+#include "../include/Square.h"
 
 Square::Square() {
     std::cout << "Initializing Square \n";

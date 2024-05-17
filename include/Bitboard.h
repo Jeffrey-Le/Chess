@@ -7,18 +7,21 @@
 
 #include <cstdint>
 
-#include "square.h"
+#include "Square.h"
 
 class Bitboard {
     private:
         uint64_t board;
-        uint64_t convertToBitBoard(std::string);
     public:
         Bitboard();
         Bitboard(Square *);
         ~Bitboard();
 
+        uint64_t convertToBitBoard(std::string);
+        void updateBitboard(std::string);
         void displayBitboard();
+
+        uint64_t useBitboard();
 };
 
 #endif //CHESS_BITBOARD_H
