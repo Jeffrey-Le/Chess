@@ -13,7 +13,7 @@ class Piece {
     protected:
         uint64_t *pieceBoard; // How to track piece on Board
 
-        int value; // How to track piece in Classes
+        float value; // How to track piece in Classes
 
         sf::Texture texture;
         sf::Sprite sprite;
@@ -21,6 +21,8 @@ class Piece {
         Piece();
         Piece(uint64_t*);
         ~Piece();
+
+        void setPosition(float, float);
 
         void setValue(int);
 
@@ -31,6 +33,8 @@ class Piece {
         void setBitBoard(uint64_t*);
 
         sf::Sprite useSprite();
+
+        float useVal();
 
         void displayBoard();
 };

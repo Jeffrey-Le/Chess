@@ -10,10 +10,20 @@
 #include "Bitboard.h"
 #include "Board.h"
 
+#include "Pawn.h"
+#include "Knight.h"
+
 class GameLogic {
     private:
+        // General Logic
+        bool playerTurn = false;
+
+        bool enPeasant = true;
+
+        int turnCounter = 0;
         // Keep Board State
         Board *curBoard;
+        Bitboard *curBitboard;
         // Initialize Bitboards for each Piece
         Bitboard *whitePawn;
         Bitboard *whiteRook;
@@ -33,8 +43,13 @@ class GameLogic {
         GameLogic(Board &);
         ~GameLogic();
 
+        void getPossibleMoves(int);
+
         void displayBitboard(char, char);
         void revertBitboard();
+
+        uint64_t bitwiseAnd(uint64_t, uint64_t);
+        uint64_t bitwiseOr(uint64_t, uint64_t);
 };
 
 #endif //CHESS_GAMELOGIC_H

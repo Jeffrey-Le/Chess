@@ -74,6 +74,24 @@ Bitboard::~Bitboard() {
     //delete this->board;
 }
 
+void Bitboard::pawnMoves(float piece) {
+    if (this->board == 0ULL || round(abs(piece)) == 1.0f)
+    {
+        std::cout << "ERROR, NO BOARD INITIALIZED OR WRONG PIECE" << std::endl;
+        return;
+    }
+
+    // White
+    if (piece > 0.0f)
+    {
+        if (this->board >> 7) {
+
+        }
+    }
+
+    // Black
+}
+
 uint64_t  Bitboard::convertToBitBoard(std::string Binary) {
     size_t offset = 0;
     if (Binary.at(0) == '0')

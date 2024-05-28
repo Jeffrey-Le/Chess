@@ -5,6 +5,7 @@
 
 GameLogic::GameLogic() {
     this->curBoard = nullptr;
+    this->curBitboard = nullptr;
 
     this->whitePawn = new Bitboard();
     this->whiteRook = new Bitboard();
@@ -23,6 +24,7 @@ GameLogic::GameLogic() {
 
 GameLogic::GameLogic(Board &board) {
     this->curBoard = &board;
+    this->curBitboard = new Bitboard();
 
     // Initialize White Bitboards
     this->whitePawn = new Bitboard();
@@ -54,22 +56,30 @@ GameLogic::GameLogic(Board &board) {
             case 1:
                 std::cout << "1" << std::endl;
                 this->whitePawn->updateBitboard(Binary);
+                squares[i].setOccupiedPiece(new Pawn('w'));
                 break;
             case -1:
                 std::cout << "-1" << std::endl;
                 this->blackPawn->updateBitboard(Binary);
+                squares[i].setOccupiedPiece(new Pawn('b'));
                 break;
             case 3:
                 std::cout << "3" << std::endl;
-                if (pieceVal == 3.1f)
+                if (pieceVal == 3.1f) {
                     this->whiteKnight->updateBitboard(Binary);
-                if (pieceVal == 3.2f)
+                    squares[i].setOccupiedPiece(new Knight('w'));
+                }
+                if (pieceVal == 3.2f) {
                     this->whiteBishop->updateBitboard(Binary);
+
+                }
                 break;
             case -3:
                 std::cout << "-3" << std::endl;
-                if (pieceVal == -3.1f)
+                if (pieceVal == -3.1f) {
                     this->blackKnight->updateBitboard(Binary);
+                    squares[i].setOccupiedPiece(new Knight('b'));
+                }
                 if (pieceVal == -3.2f)
                     this->blackBishop->updateBitboard(Binary);
                 break;
@@ -96,7 +106,7 @@ GameLogic::GameLogic(Board &board) {
                 if (pieceVal == -0.1f)
                     this->blackKing->updateBitboard(Binary);
         }
-
+    this->curBitboard->updateBitboard(Binary); // Updates Game Board State
     }
 
 
@@ -222,4 +232,72 @@ void GameLogic::revertBitboard() {
 //
 //    std::cout << "New Board" << std::endl;
 //    this->curBoard->displayBoard();
+}
+
+void GameLogic::getPossibleMoves(int index) {
+    Square *squares = this->curBoard->useBoard();
+
+    std::string Binary = "000ULL";
+
+    float pieceVal = squares[index].usePiece();
+
+    switch (int64_t(round(pieceVal))) {
+        case 1:
+        {
+            std::cout << "1" << std::endl;
+            uint64_t possibeCapture = this->bitwiseOr(this->whitePawn->useBitboard() >> 7, this->whitePawn->useBitboard() >> 9);
+            if (this->bitwiseAnd(possibeCapture, this->curBitboard->useBitboard()) != 0ULL)
+                std::cout << "Can Capture" << std::endl;
+            break;
+        }
+        case -1:
+            std::cout << "-1" << std::endl;
+            this->blackPawn->updateBitboard(Binary);
+            break;
+        case 3:
+            std::cout << "3" << std::endl;
+            if (pieceVal == 3.1f)
+                this->whiteKnight->updateBitboard(Binary);
+            if (pieceVal == 3.2f)
+                this->whiteBishop->updateBitboard(Binary);
+            break;
+        case -3:
+            std::cout << "-3" << std::endl;
+            if (pieceVal == -3.1f)
+                this->blackKnight->updateBitboard(Binary);
+            if (pieceVal == -3.2f)
+                this->blackBishop->updateBitboard(Binary);
+            break;
+        case 5:
+            std::cout << "5" << std::endl;
+            this->whiteRook->updateBitboard(Binary);
+            break;
+        case -5:
+            std::cout << "-5" << std::endl;
+            this->blackRook->updateBitboard(Binary);
+            break;
+        case 9:
+            std::cout << "9" << std::endl;
+            this->whiteQueen->updateBitboard(Binary);
+            break;
+        case -9:
+            std::cout << "-9" << std::endl;
+            this->blackQueen->updateBitboard(Binary);
+            break;
+        default:
+            std::cout << "default" << std::endl;
+            if (pieceVal == 0.1f)
+                this->whiteKing->updateBitboard(Binary);
+            if (pieceVal == -0.1f)
+                this->blackKing->updateBitboard(Binary);
+    }
+
+}
+
+uint64_t GameLogic::bitwiseAnd(uint64_t board1, uint64_t board2) {
+    return board1 & board2;
+}
+
+uint64_t GameLogic::bitwiseOr(uint64_t board1, uint64_t board2) {
+    return board1 | board2;
 }

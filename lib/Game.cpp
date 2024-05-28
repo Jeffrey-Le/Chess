@@ -3,6 +3,7 @@
 //
 
 #include "../include/Game.h"
+#include "../include/CustomEvent.h"
 
 Game::Game() {
     this->window.create(sf::VideoMode(960, 720), "SFML Application");
@@ -30,15 +31,23 @@ void Game::openGame() {
 
     Square *squares = this->board->useBoard();
 
+    Piece *track = nullptr;
+
+    std::cout << "Track Initalized: " << track << std::endl;
+
+    CustomEvent customEvent;
+
     while (this->window.isOpen())
     {
-        sf::Event event; // Event
+        sf::Event event = customEvent.useCustomEvent();
+        //sf::Event event; // CustomEvent
 
         this->window.clear(sf::Color(sf::Color(0, 255, 0))); // Clears Canvas
 
         // Draw Content onto Window
         for (int i = 0; i < 64; i++) {
             this->window.draw(squares[i].useSquare());
+            this->window.draw(squares[i].useOccupiedPiece()->useSprite());
         }
 
         for (int i = 0; i < 8; i++)
@@ -50,27 +59,26 @@ void Game::openGame() {
         this->window.display(); // Display
 
 
-        // Event to check when user attempts to close window
+        // CustomEvent to check when user attempts to close window
         while (this->window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 this->window.close();
 
-
             if (event.type == sf::Event::MouseButtonPressed)
             {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    for (int i = 0 ; i < 64; i++)
-                    {
-                        if (squares[i].isClicked(this->window)) {
-                            std::cout << i << std::endl;
-                            // Display Blue Squares
-                            squares[i].checkPiece();
-                        }
+
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    track = customEvent.squareClickLogic(this->window, squares, track);
+
+                    if (track != nullptr) {
+                        std::cout << "Outside: " << track << std::endl;
                     }
+                    else
+                        std::cout << "NullPTR" << std::endl;
                 }
             }
+
         }
 
     }

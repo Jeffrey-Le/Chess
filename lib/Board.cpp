@@ -15,9 +15,9 @@ Board::Board() {
 
     for (int i = 0; i < 64; i++) {
         if (i % 2 == 0)
-            this->square[i].setColor(sf::Color(255, 255, 255));
+            this->square[i].setColor(sf::Color(255, 255, 255, 255));
         else
-            this->square[i].setColor(sf::Color(0, 0, 0));
+            this->square[i].setColor(sf::Color(0, 0, 0, 255));
     }
 
     this->font.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/arial.ttf");

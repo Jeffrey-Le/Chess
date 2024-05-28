@@ -17,6 +17,14 @@ class Bitboard {
         Bitboard(Square *);
         ~Bitboard();
 
+        // Possible Moves
+        void pawnMoves(float);
+        void knightMoves(float);
+        void bishopMoves(float);
+        void rookMoves(float);
+        void queenMoves(float);
+        void kingMoves(float);
+
         uint64_t convertToBitBoard(std::string);
         void updateBitboard(std::string);
         void displayBitboard();

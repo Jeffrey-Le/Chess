@@ -9,6 +9,7 @@
 
 class Pawn : public Piece {
     private:
+        bool firstMove = false;
     public:
         Pawn();
         Pawn(char);

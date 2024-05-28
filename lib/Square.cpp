@@ -9,6 +9,8 @@ Square::Square() {
 
     this->squareSpace = new sf::RectangleShape(sf::Vector2f(50.f, 50.f));
     this->squareSpace->setPosition(0.f, 0.f);
+
+    this->occupiedPiece = new Piece();
 }
 
 Square::Square(float pieceVal) {
@@ -17,6 +19,8 @@ Square::Square(float pieceVal) {
     this->squareSpace = new sf::RectangleShape(sf::Vector2f(50.f, 50.f));
     this->squareSpace->setPosition(0.f, 0.f);
     this->piece = pieceVal;
+
+    this->occupiedPiece = new Piece();
 }
 
 Square::~Square() {
@@ -29,6 +33,7 @@ void Square::echoPiece() {
 
 void Square::changePiece(float changedPiece) {
     this->piece = changedPiece;
+    this->isEmpty = false;
 }
 
 void Square::checkPiece() {
@@ -62,11 +67,30 @@ void Square::checkPiece() {
             // King
             std::cout << "King" << std::endl;
     }
+}
 
+
+bool Square::checkClickable(sf::RenderWindow &window, Piece *newPiece, float pieceValue) {
+    sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
+
+    if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && this->isValidMove) {
+        std::cout << "In Check Clickable" << std::endl;
+        this->setOccupiedPiece(newPiece);
+        this->changePiece(pieceValue);
+
+        this->isValidMove = false;
+
+        return true;
+    }
+
+    this->isValidMove = false;
+
+    return false;
 }
 
 void Square::setColor(sf::Color color) {
     this->squareSpace->setFillColor(color);
+    this->color = color;
 }
 
 void Square::setPos(float x, float y) {
@@ -90,8 +114,31 @@ bool Square::isClicked(sf::RenderWindow &window) {
 
     sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
 
-    if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y)) {
+    if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && !this->isValidMove && !this->isEmpty) {
+        this->squareSpace->setFillColor(sf::Color(0, 0, 175, 150));
         return true;
     }
+
+    if (this->squareSpace->getFillColor() != this->color)
+        this->squareSpace->setFillColor(this->color);
+
+    if (this->piece == 0.0f && this->isEmpty)
+        this->isValidMove = true;
+}
+
+void Square::setOccupiedPiece(Piece *newPiece) {
+    this->occupiedPiece = newPiece;
+
+    //this->occupiedPiece->displayBoard();
+    this->changePiece(this->occupiedPiece->useVal());
+
+    // Sets Position
+    sf::Vector2f pos = this->squareSpace->getPosition();
+
+    this->occupiedPiece->setPosition(pos.x, pos.y);
+}
+
+Piece *Square::useOccupiedPiece() {
+    return this->occupiedPiece;
 }
 

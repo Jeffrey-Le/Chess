@@ -17,6 +17,9 @@ Piece::~Piece() {
     delete this->pieceBoard;
 };
 
+void Piece::setPosition(float x, float y) {
+    this->sprite.setPosition(x, y);
+}
 
 void Piece::setValue(int newValue) {
     this->value = newValue;
@@ -24,11 +27,16 @@ void Piece::setValue(int newValue) {
 
 void Piece::setTexture(sf::Texture newTextureObj) {
     this->texture = newTextureObj;
+    this->sprite.setTexture(this->texture);
 }
 
 void Piece::setTexture(std::string pathToTexture) {
-    if (!this->texture.loadFromFile(pathToTexture))
+    if (!this->texture.loadFromFile(pathToTexture)) {
         std::cout << "Error Loading New Texture from file path:" << std::endl << pathToTexture << std::endl;
+        return;
+    }
+
+    this->sprite.setTexture(this->texture);
 }
 
 
@@ -37,7 +45,16 @@ void Piece::setBitBoard(uint64_t *newBitBoard) {
 }
 
 sf::Sprite Piece::useSprite() {
+//    if (!this->sprite.getTexture())
+//    {
+//        std::cout << "No Texture Loaded" << std::endl;
+//    }
+
     return this->sprite;
+}
+
+float Piece::useVal() {
+    return this->value;
 }
 
 void Piece::displayBoard() {

@@ -1,49 +1,52 @@
 //
-// Created by Jeffrey Vo Le on 5/11/24.
+// Created by Jeffrey Vo Le on 5/17/24.
 //
 
-#include "../include/Pawn.h"
+#include "../include/Knight.h"
 
-Pawn::Pawn() {
-    this->value = 1.0f;
+
+Knight::Knight() {
+    this->value = 3.1f;
 
     if (!texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
     {
         // error...
-        std::cout << "Error Loading Pawn Texture" << std::endl;
+        std::cout << "Error Loading Knight Texture" << std::endl;
     }
 
     this->sprite.setTexture(this->texture);
-    this->pieceBoard = new uint64_t(0x00ff000000000000);
+    this->pieceBoard = new uint64_t(0x4200000000000000);
 }
 
-Pawn::Pawn(char color) {
-    this->value = 1.0f;
+Knight::Knight(char color) {
+    this->value = 3.1f;
 
     if (color == 'w')
     {
         if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
         {
             // error...
-            std::cout << "Error Loading Pawn Texture" << std::endl;
+            std::cout << "Error Loading Knight Texture" << std::endl;
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x00ff000000000000);
+        this->pieceBoard = new uint64_t(0x4200000000000000);
         return;
-        }
+    }
     if (color == 'b')
     {
         if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
         {
             // error...
-            std::cout << "Error Loading Pawn Texture" << std::endl;
+            std::cout << "Error Loading Knight Texture" << std::endl;
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x000000000000ff00);
+        this->pieceBoard = new uint64_t(0x42);
         return;
     }
+
+    //0000000000000000000000000000000000000000000000000000000010000010
 
     this->pieceBoard = new uint64_t(0);
 }
