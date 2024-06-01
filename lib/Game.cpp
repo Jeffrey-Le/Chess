@@ -27,7 +27,7 @@ void Game::openGame() {
 
     //this->board->displayBoard();
 
-    GameLogic *test = new GameLogic(*this->board);
+    auto *test = new GameLogic(*this->board);
 
     Square *squares = this->board->useBoard();
 
@@ -72,12 +72,6 @@ void Game::openGame() {
 
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     customEvent.squareClickLogic(this->window, squares, track, event);
-
-                    // if (track != nullptr) {
-                    //     std::cout << "Outside: " << track << std::endl;
-                    // }
-                    // else
-                    //     std::cout << " Track is NullPTR" << std::endl;
                 }
             }
 

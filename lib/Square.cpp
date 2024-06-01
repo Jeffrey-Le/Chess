@@ -27,7 +27,7 @@ Square::~Square() {
     delete this->squareSpace;
 }
 
-void Square::echoPiece() {
+void Square::echoPiece() const{
     std::cout << this->piece << std::endl << int(floor(this->piece)) << std::endl;
 }
 
@@ -36,7 +36,7 @@ void Square::changePiece(float changedPiece) {
     this->isEmpty = false;
 }
 
-void Square::checkPiece() {
+void Square::checkPiece() const{
     switch (int(floor(this->piece)))
     {
         case 1:
@@ -70,9 +70,8 @@ void Square::checkPiece() {
 }
 
 
-bool Square::checkClickable(sf::RenderWindow const &window, Piece *newPiece, float pieceValue) {
-    sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
-
+bool Square::checkClickable(sf::RenderWindow const &window, Piece *newPiece, float const pieceValue) {
+    sf::Vector2i const mouseCoords = sf::Mouse::getPosition(window);
 
     if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && this->isValidMove) {
         std::cout << "In Check Clickable" << std::endl;
@@ -89,25 +88,25 @@ bool Square::checkClickable(sf::RenderWindow const &window, Piece *newPiece, flo
     return false;
 }
 
-void Square::setColor(sf::Color color) {
+void Square::setColor(sf::Color const color) {
     this->squareSpace->setFillColor(color);
     this->color = color;
 }
 
-void Square::setPos(float x, float y) {
+void Square::setPos(float const x, float const y) const {
     this->squareSpace->setPosition(x, y);
 }
 
 
-sf::Vector2f Square::usePos() {
+sf::Vector2f Square::usePos() const {
     return this->squareSpace->getPosition();
 }
 
-sf::RectangleShape Square::useSquare() {
+sf::RectangleShape Square::useSquare() const {
     return *this->squareSpace;
 }
 
-float Square::usePiece() {
+float Square::usePiece() const {
     return this->piece;
 }
 
@@ -155,7 +154,7 @@ void Square::setOccupiedPiece(Piece *newPiece) {
 
 }
 
-Piece *Square::useOccupiedPiece() {
+Piece *Square::useOccupiedPiece() const {
     if (this->occupiedPiece == nullptr)
         return nullptr;
 

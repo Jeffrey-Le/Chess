@@ -17,7 +17,7 @@ class Board {
     private:
         Bitboard *board;
 
-        uint64_t fullInt(uint64_t);
+        static uint64_t fullInt(uint64_t);
 
         Square *square;
 
@@ -34,15 +34,15 @@ class Board {
 
         void setSquares(Square *);
 
-        void displayBoard();
+        void displayBoard() const;
 
-        void startGame();
+        void startGame() const;
 
-        void drawBoard();
+        void drawBoard() const;
 
-        Square *useBoard();
+        Square *useBoard() const;
 
-        sf::Text *usePositions(char);
+        sf::Text *usePositions(char) const;
 };
 
 #endif //CHESS_BOARD_H

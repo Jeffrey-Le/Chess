@@ -22,22 +22,22 @@ class Square {
         bool isEmpty = true;
     public:
         Square();
-        Square(float);
+        explicit Square(float);
         ~Square();
 
-        void echoPiece();
+        void echoPiece() const;
         void changePiece(float);
-        void checkPiece();
+        void checkPiece() const;
         bool checkClickable(sf::RenderWindow const &, Piece *, float);
 
         void setOccupiedPiece(Piece *);
         void setColor(sf::Color);
-        void setPos(float, float);
+        void setPos(float, float) const;
 
-        sf::Vector2f usePos();
-        sf::RectangleShape useSquare();
-        float usePiece();
-        Piece *useOccupiedPiece();
+        sf::Vector2f usePos() const;
+        sf::RectangleShape useSquare() const;
+        float usePiece() const;
+        Piece *useOccupiedPiece() const;
 
         bool isClicked(sf::RenderWindow const &);
 };

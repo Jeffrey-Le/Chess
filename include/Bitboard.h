@@ -14,7 +14,7 @@ class Bitboard {
         uint64_t board;
     public:
         Bitboard();
-        Bitboard(Square *);
+        explicit Bitboard(Square *);
         ~Bitboard();
 
         // Possible Moves
@@ -25,11 +25,11 @@ class Bitboard {
         void queenMoves(float);
         void kingMoves(float);
 
-        uint64_t convertToBitBoard(std::string);
-        void updateBitboard(std::string);
-        void displayBitboard();
+        static uint64_t convertToBitBoard(std::string const &);
+        void updateBitboard(std::string const &);
+        void displayBitboard() const;
 
-        uint64_t useBitboard();
+        uint64_t useBitboard() const;
 };
 
 #endif //CHESS_BITBOARD_H

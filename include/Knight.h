@@ -14,7 +14,7 @@ class Knight : public Piece {
     protected:
     public:
         Knight();
-        Knight(char);
+        explicit Knight(char);
 };
 
 #endif //CHESS_KNIGHT_H

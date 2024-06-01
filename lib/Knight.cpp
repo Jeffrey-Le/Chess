@@ -18,7 +18,7 @@ Knight::Knight() {
     this->pieceBoard = new uint64_t(0x4200000000000000);
 }
 
-Knight::Knight(char color) {
+Knight::Knight(char const color) {
     this->value = 3.1f;
 
     if (color == 'w')

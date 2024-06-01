@@ -12,7 +12,7 @@ class Pawn : public Piece {
         bool firstMove = false;
     public:
         Pawn();
-        Pawn(char);
+        explicit Pawn(char);
 
 };
 

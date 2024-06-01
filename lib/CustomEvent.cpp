@@ -14,27 +14,9 @@ CustomEvent::CustomEvent(GameLogic *&existingLogic) {
     this->logic = existingLogic;
 }
 
-void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squares, Square *&trackedPiece, sf::Event &event) {
+void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squares, Square *&trackedPiece, sf::Event &event) const{
     bool temp = false;
     for (int i = 0; i < 64; i++) {
-        // if (trackedPiece != nullptr)
-        //     std::cout << trackedPiece->usePiece() << std::endl;
-        // else
-        //     std::cout << "NULLPTR Square" << std::endl;
-
-        // if (event.type == sf::Event::MouseButtonPressed)
-        // {
-        //     if (event.mouseButton.button == sf::Mouse::Left) {
-        //
-        //         if (squares[i].isClicked(window) && squares[i].usePiece() != 0.0f)
-        //             std::cout << "Clicked: " << squares[i].useOccupiedPiece() << std::endl;
-        //
-        //         if (squares[i].isClicked(window) && squares[i].usePiece() == 0.0f)
-        //
-        //     }
-        // }
-        //
-        //
         if (squares[i].isClicked(window) && squares[i].usePiece() != 0.0f) {
             // Display Blue Squares
             //squares[i].checkPiece();
@@ -74,7 +56,7 @@ void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squ
 }
 
 
-sf::Event CustomEvent::useCustomEvent() {
+sf::Event CustomEvent::useCustomEvent() const{
     return this->event;
 }
 

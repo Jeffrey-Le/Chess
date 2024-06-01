@@ -18,11 +18,11 @@ class CustomEvent {
         GameLogic *logic;
     public:
         CustomEvent();
-        CustomEvent(GameLogic *&);
+        explicit CustomEvent(GameLogic *&);
 
-        void squareClickLogic(sf::RenderWindow const&, Square *&, Square *&, sf::Event &);
+        void squareClickLogic(sf::RenderWindow const&, Square *&, Square *&, sf::Event &) const;
 
-        sf::Event useCustomEvent();
+        sf::Event useCustomEvent() const;
 };
 
 #endif //CHESS_CUSTOMEVENT_H

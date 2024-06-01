@@ -11,18 +11,10 @@ Board::Board() {
 
     this->square = new Square[64]; // Change to 2d array
 
+    this->font.loadFromFile("../res/arial.ttf");
+
     this->numPositions = new sf::Text[8];
     this->letterPositions = new sf::Text[8];
-
-    // Initialize Board State
-    for (int i = 0; i < 64; i++) {
-        if (i % 2 == 0)
-            this->square[i].setColor(sf::Color(255, 255, 255, 255));
-        else
-            this->square[i].setColor(sf::Color(0, 0, 0, 255));
-    }
-
-    this->font.loadFromFile("../res/arial.ttf");
 
     // Initialize Numbers
     for (int i = 0; i < 8; i++)
@@ -61,16 +53,15 @@ void Board::setSquares(Square *newSquare) {
     this->square = newSquare;
 }
 
-void Board::displayBoard() {
-    using namespace std;
-    //std::cout << std::setw(32) << std::setfill('0') << this->board;
+void Board::displayBoard() const {
+    // Displays the Piece Value of Each Square on Board
     for (int i = 0; i < 64; i++)
     {
         if (i % 8 == 0)
-            cout << endl;
-        cout << this->square[i].usePiece();
+            std::cout << std::endl;
+        std::cout << this->square[i].usePiece();
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
 uint64_t Board::fullInt(uint64_t const numVal) {
@@ -79,7 +70,7 @@ uint64_t Board::fullInt(uint64_t const numVal) {
 }
 
 // Starts a Normal Game
-void Board::startGame() {
+void Board::startGame() const {
     // Set White Positions
     this->square[63].changePiece(5.0f); // Rook
     this->square[56].changePiece(5.0f); // Rook
@@ -105,61 +96,62 @@ void Board::startGame() {
         this->square[i].changePiece(-1.0f); // Pawn
 }
 
-void Board::drawBoard() {
-
-    bool altRow = false;
-
-    // Set Square Variables
-
+void Board::drawBoard() const {
+    // Default Square
     this->square[0].setPos(50.0f, 50.0f);
+    this->square[0].setColor(sf::Color(255, 255, 255, 255));
 
-    for (int i = 1; i < 64; i++)
-    {
-        float oldX = this->square[i-1].usePos().x;
-        float oldY = this->square[i-1].usePos().y;
+    bool invertColor = false;
 
-        if (i % 16 == 8)
-        {
-            altRow = true;
-            oldX += 50.0f;
+    // Sets Positions and Colors of All Squares on Board
+    for (int i = 1; i < 64; i++) {
+        sf::Vector2f const oldPos = this->square[i-1].usePos();
+
+        // Set Square Position
+        if (i % 8 == 0) {
+            sf::Vector2f const leadingSquarePos = this->square[i-8].usePos();
+            this->square[i].setPos(leadingSquarePos.x, (leadingSquarePos.y + 50.0f));
+            invertColor = !invertColor;
         }
+        else
+            this->square[i].setPos((oldPos.x + 50.0f), oldPos.y);
 
-        if (i % 16 == 0)
-        {
-            altRow = false;
-            oldX -= 50.0f;
+        // Set Square Color
+        if (invertColor) {
+            if (i % 2 == 0)
+                this->square[i].setColor(sf::Color(0, 0, 0, 255));
+            else
+                this->square[i].setColor(sf::Color(255, 255, 255, 255));
         }
-
-        if (i % 8 == 0)
-            oldY += 50.0f;
-
-        if (altRow)
-            oldX *= -1;
-
-        this->square[i].setPos(abs((oldX + 50.0f)), oldY);
+        else {
+            if (i % 2 == 0)
+                this->square[i].setColor(sf::Color(255, 255, 255, 255));
+            else
+                this->square[i].setColor(sf::Color(0, 0, 0, 255));
+        }
     }
 
-    float lastSqX = this->square[63].usePos().x;
-    float lastSqY = this->square[63].usePos().y;
+    // Sets the Positions of RANKS and FILES of Board
+    sf::Vector2f const lastLeadingSq = this->square[56].usePos();
 
-    this->numPositions[0].setPosition(lastSqX+15.0f, lastSqY + 50.0f);
-    this->letterPositions[0].setPosition(lastSqX - 25.0f, lastSqY);
+    this->numPositions[0].setPosition(lastLeadingSq.x - 25.0f, lastLeadingSq.y);
+    this->letterPositions[0].setPosition((lastLeadingSq.x+15.0f), lastLeadingSq.y + 50.0f);
 
     for (int i = 1; i < 8; i++)
     {
-        sf::Vector2f numPos = this->numPositions[i-1].getPosition();
-        sf::Vector2f letterPos = this->letterPositions[i-1].getPosition();
+        sf::Vector2f const numPos = this->numPositions[i-1].getPosition();
+        sf::Vector2f const letterPos = this->letterPositions[i-1].getPosition();
 
-        this->numPositions[i].setPosition(numPos.x + 50.0f, numPos.y);
-        this->letterPositions[i].setPosition(letterPos.x, letterPos.y - 50.0f);
+        this->numPositions[i].setPosition(numPos.x, numPos.y - 50.0f);
+        this->letterPositions[i].setPosition(letterPos.x + 50.0f, letterPos.y);
     }
 }
 
-Square *Board::useBoard() {
+Square *Board::useBoard() const {
     return this->square;
 }
 
-sf::Text *Board::usePositions(char type) {
+sf::Text *Board::usePositions(char const type) const{
 
     if (type == 'n')
         return this->numPositions;
@@ -167,5 +159,6 @@ sf::Text *Board::usePositions(char type) {
     if (type == 'l')
         return this->letterPositions;
 
+    std::cout << "ERROR, NO TYPE INPUTTED" << std::endl;
     return nullptr;
 }

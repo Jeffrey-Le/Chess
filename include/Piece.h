@@ -19,24 +19,24 @@ class Piece {
         sf::Sprite sprite;
     public:
         Piece();
-        Piece(uint64_t*);
+        explicit Piece(uint64_t*);
         ~Piece();
 
         void setPosition(float, float);
 
-        void setValue(int);
+        void setValue(float);
 
-        void setTexture(sf::Texture);
+        void setTexture(sf::Texture const &);
 
-        void setTexture(std::string);
+        void setTexture(std::string const &);
 
         void setBitBoard(uint64_t*);
 
         sf::Sprite useSprite();
 
-        float useVal();
+        float useVal() const;
 
-        void displayBoard();
+        void displayBoard() const;
 };
 
 #endif //CHESS_PIECE_H

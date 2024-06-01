@@ -17,14 +17,14 @@ Pawn::Pawn() {
     this->pieceBoard = new uint64_t(0x00ff000000000000);
 }
 
-Pawn::Pawn(char color) {
+Pawn::Pawn(char const color) {
     this->value = 1.0f;
 
     if (color == 'w')
     {
         if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
-            // error...
+            // ERROR
             std::cout << "Error Loading Pawn Texture" << std::endl;
         }
 
@@ -36,7 +36,7 @@ Pawn::Pawn(char color) {
     {
         if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
-            // error...
+            // ERROR
             std::cout << "Error Loading Pawn Texture" << std::endl;
         }
 

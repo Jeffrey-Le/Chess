@@ -63,11 +63,11 @@ GameLogic::~GameLogic() {
     delete this->blackKing;
 }
 
-void GameLogic::setIntialBoard() {
+void GameLogic::setIntialBoard() const {
 
     Square *squares = this->curBoard->useBoard();
 
-    std::string Binary;
+    static std::string Binary;
 
     for (int i = 0; i < 64; i++)
     {
@@ -133,7 +133,7 @@ void GameLogic::setIntialBoard() {
     }
 }
 
-void GameLogic::displayBitboard(char name, char color) {
+void GameLogic::displayBitboard(char const name, char const color) const {
 
     if (color == 'w')
     {
@@ -201,7 +201,7 @@ void GameLogic::displayBitboard(char name, char color) {
         std::cout << "ERROR, NO COLOR PROVIDED" << std::endl;
 }
 
-void GameLogic::revertBitboard() {
+void GameLogic::revertBitboard() const{
     // Check if Board Exists
     if (this->curBoard == nullptr)
     {
@@ -241,13 +241,13 @@ void GameLogic::revertBitboard() {
 }
 
 void GameLogic::getPossibleMoves(int const index) {
-    Moves moves;
+    Moves const moves;
 
     Square *squares = this->curBoard->useBoard();
 
-    std::string Binary = "000ULL";
+    std::string const Binary = "000ULL";
 
-    float pieceVal = squares[index].usePiece();
+    float const pieceVal = squares[index].usePiece();
 
     switch (int64_t(round(pieceVal))) {
         case 1:
@@ -306,10 +306,10 @@ void GameLogic::getPossibleMoves(int const index) {
 
 }
 
-uint64_t GameLogic::bitwiseAnd(uint64_t board1, uint64_t board2) {
+uint64_t GameLogic::bitwiseAnd(uint64_t const board1, uint64_t const board2) {
     return board1 & board2;
 }
 
-uint64_t GameLogic::bitwiseOr(uint64_t board1, uint64_t board2) {
+uint64_t GameLogic::bitwiseOr(uint64_t const board1, uint64_t const board2) {
     return board1 | board2;
 }

@@ -92,7 +92,7 @@ void Bitboard::pawnMoves(float piece) {
     // Black
 }
 
-uint64_t  Bitboard::convertToBitBoard(std::string Binary) {
+uint64_t Bitboard::convertToBitBoard(std::string const &Binary) {
     size_t offset = 0;
     if (Binary.at(0) == '0')
         return std::stoull(Binary, &offset, 2);
@@ -100,14 +100,14 @@ uint64_t  Bitboard::convertToBitBoard(std::string Binary) {
         return std::stoull("1"+Binary.substr(2), &offset, 2)*2;
 }
 
-void Bitboard::updateBitboard(std::string Binary) {
-    this->board += this->convertToBitBoard(Binary);
+void Bitboard::updateBitboard(std::string const &Binary) {
+    this->board += Bitboard::convertToBitBoard(Binary);
 }
 
-void Bitboard::displayBitboard() {
+void Bitboard::displayBitboard() const{
     std::cout << uint64_t(this->board) << std::endl;
 }
 
-uint64_t Bitboard::useBitboard() {
+uint64_t Bitboard::useBitboard() const{
     return this->board;
 }
