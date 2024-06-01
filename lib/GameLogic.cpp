@@ -5,7 +5,7 @@
 
 GameLogic::GameLogic() {
     this->curBoard = nullptr;
-    this->curBitboard = nullptr;
+    this->curBitboard = new Bitboard();
 
     this->whitePawn = new Bitboard();
     this->whiteRook = new Bitboard();
@@ -42,7 +42,30 @@ GameLogic::GameLogic(Board &board) {
     this->blackQueen = new Bitboard();
     this->blackKing = new Bitboard();
 
-    Square *squares = board.useBoard();
+    this->setIntialBoard();
+}
+
+GameLogic::~GameLogic() {
+    delete this->curBoard;
+
+    // Free Piece Bitboard memory space
+    delete this->whitePawn;
+    delete this->whiteRook;
+    delete this->whiteKnight;
+    delete this->whiteBishop;
+    delete this->whiteQueen;
+    delete this->whiteKing;
+    delete this->blackPawn;
+    delete this->blackRook;
+    delete this->blackKnight;
+    delete this->blackBishop;
+    delete this->blackQueen;
+    delete this->blackKing;
+}
+
+void GameLogic::setIntialBoard() {
+
+    Square *squares = this->curBoard->useBoard();
 
     std::string Binary;
 
@@ -108,58 +131,39 @@ GameLogic::GameLogic(Board &board) {
         }
     this->curBitboard->updateBitboard(Binary); // Updates Game Board State
     }
-
-
-}
-
-GameLogic::~GameLogic() {
-    delete this->curBoard;
-
-    // Free Piece Bitboard memory space
-    delete this->whitePawn;
-    delete this->whiteRook;
-    delete this->whiteKnight;
-    delete this->whiteBishop;
-    delete this->whiteQueen;
-    delete this->whiteKing;
-    delete this->blackPawn;
-    delete this->blackRook;
-    delete this->blackKnight;
-    delete this->blackBishop;
-    delete this->blackQueen;
-    delete this->blackKing;
 }
 
 void GameLogic::displayBitboard(char name, char color) {
+
     if (color == 'w')
     {
-        switch (std::tolower(name)) {
-            case 'p':
-                std::cout << "WhitePawn Bitboard:" << std::endl;
-                this->whitePawn->displayBitboard();
-                break;
-            case 'n':
-                std::cout << "WhiteKnight Bitboard:" << std::endl;
-                this->whiteKnight->displayBitboard();
-                break;
-            case 'b':
-                std::cout << "WhiteBishop Bitboard:" << std::endl;
-                this->whiteBishop->displayBitboard();
-                break;
-            case 'r':
-                std::cout << "WhiteRook Bitboard:" << std::endl;
-                this->whiteRook->displayBitboard();
-                break;
-            case 'q':
-                std::cout << "WhiteQueen Bitboard:" << std::endl;
-                this->whiteQueen->displayBitboard();
-                break;
-            case 'k':
-                std::cout << "WhiteKing Bitboard:" << std::endl;
-                this->whiteKing->displayBitboard();
-                break;
-            default:
-                std::cout << "NO PIECE CHARACTER INPUTTED" << std::endl; // Error
+    switch (std::tolower(name)) {
+        case 'p':
+            std::cout << "WhitePawn Bitboard:" << std::endl;
+            this->whitePawn->displayBitboard();
+            break;
+        case 'n':
+            std::cout << "WhiteKnight Bitboard:" << std::endl;
+            this->whiteKnight->displayBitboard();
+            break;
+        case 'b':
+            std::cout << "WhiteBishop Bitboard:" << std::endl;
+            this->whiteBishop->displayBitboard();
+            break;
+        case 'r':
+            std::cout << "WhiteRook Bitboard:" << std::endl;
+            this->whiteRook->displayBitboard();
+            break;
+        case 'q':
+            std::cout << "WhiteQueen Bitboard:" << std::endl;
+            this->whiteQueen->displayBitboard();
+            break;
+        case 'k':
+            std::cout << "WhiteKing Bitboard:" << std::endl;
+            this->whiteKing->displayBitboard();
+            break;
+        default:
+            std::cout << "NO PIECE CHARACTER INPUTTED" << std::endl; // Error
         }
     }
     if (color == 'b') {
@@ -192,7 +196,9 @@ void GameLogic::displayBitboard(char name, char color) {
                 std::cout << "NO PIECE CHARACTER INPUTTED" << std::endl; // Error
         }
     }
-    std::cout << "ERROR, NO COLOR PROVIDED" << std::endl;
+
+    if (color != 'w' && color != 'b')
+        std::cout << "ERROR, NO COLOR PROVIDED" << std::endl;
 }
 
 void GameLogic::revertBitboard() {
@@ -234,7 +240,9 @@ void GameLogic::revertBitboard() {
 //    this->curBoard->displayBoard();
 }
 
-void GameLogic::getPossibleMoves(int index) {
+void GameLogic::getPossibleMoves(int const index) {
+    Moves moves;
+
     Square *squares = this->curBoard->useBoard();
 
     std::string Binary = "000ULL";
@@ -245,9 +253,11 @@ void GameLogic::getPossibleMoves(int index) {
         case 1:
         {
             std::cout << "1" << std::endl;
-            uint64_t possibeCapture = this->bitwiseOr(this->whitePawn->useBitboard() >> 7, this->whitePawn->useBitboard() >> 9);
-            if (this->bitwiseAnd(possibeCapture, this->curBitboard->useBitboard()) != 0ULL)
-                std::cout << "Can Capture" << std::endl;
+            // uint64_t const possibeCapture = this->bitwiseOr(this->whitePawn->useBitboard() >> 7, this->whitePawn->useBitboard() >> 9);
+            // if (this->bitwiseAnd(possibeCapture, this->curBitboard->useBitboard()) != 0ULL)
+            //     // REturn Bitboard instead and revert to display on visual board
+            //     std::cout << "Can Capture" << std::endl;
+            moves.getPawnMoves(1, this->whitePawn,squares);
             break;
         }
         case -1:
@@ -256,8 +266,10 @@ void GameLogic::getPossibleMoves(int index) {
             break;
         case 3:
             std::cout << "3" << std::endl;
-            if (pieceVal == 3.1f)
+            if (pieceVal == 3.1f) {
+                moves.getPawnMoves(1, this->whitePawn,squares);
                 this->whiteKnight->updateBitboard(Binary);
+            }
             if (pieceVal == 3.2f)
                 this->whiteBishop->updateBitboard(Binary);
             break;

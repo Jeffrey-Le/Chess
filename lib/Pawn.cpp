@@ -7,7 +7,7 @@
 Pawn::Pawn() {
     this->value = 1.0f;
 
-    if (!texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+    if (!texture.loadFromFile("../res/blackKnight.png"))
     {
         // error...
         std::cout << "Error Loading Pawn Texture" << std::endl;
@@ -22,7 +22,7 @@ Pawn::Pawn(char color) {
 
     if (color == 'w')
     {
-        if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+        if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
             // error...
             std::cout << "Error Loading Pawn Texture" << std::endl;
@@ -34,7 +34,7 @@ Pawn::Pawn(char color) {
         }
     if (color == 'b')
     {
-        if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+        if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
             // error...
             std::cout << "Error Loading Pawn Texture" << std::endl;

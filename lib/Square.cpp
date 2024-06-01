@@ -70,8 +70,9 @@ void Square::checkPiece() {
 }
 
 
-bool Square::checkClickable(sf::RenderWindow &window, Piece *newPiece, float pieceValue) {
+bool Square::checkClickable(sf::RenderWindow const &window, Piece *newPiece, float pieceValue) {
     sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
+
 
     if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && this->isValidMove) {
         std::cout << "In Check Clickable" << std::endl;
@@ -110,11 +111,13 @@ float Square::usePiece() {
     return this->piece;
 }
 
-bool Square::isClicked(sf::RenderWindow &window) {
+bool Square::isClicked(sf::RenderWindow const &window) {
 
     sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
 
+    // Means a Piece is on the board
     if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && !this->isValidMove && !this->isEmpty) {
+        std::cout << "Square in IsClicked" << std::endl;
         this->squareSpace->setFillColor(sf::Color(0, 0, 175, 150));
         return true;
     }
@@ -124,21 +127,38 @@ bool Square::isClicked(sf::RenderWindow &window) {
 
     if (this->piece == 0.0f && this->isEmpty)
         this->isValidMove = true;
+
+    return false;
 }
 
 void Square::setOccupiedPiece(Piece *newPiece) {
-    this->occupiedPiece = newPiece;
 
-    //this->occupiedPiece->displayBoard();
-    this->changePiece(this->occupiedPiece->useVal());
+    std::cout << newPiece << std::endl;
+    if (newPiece->useVal() == 0.0f) {
+        this->occupiedPiece = newPiece;
+        this->changePiece(0.0f);
+        std::cout << "In Occupied Piece Nullptr" << std::endl;
+        this->isValidMove = true;
+        this->isEmpty = true;
+    }
+    else {
+        this->occupiedPiece = newPiece;
+        std::cout << "Outside SetOccupiedPiece" << std::endl;
+        //this->occupiedPiece->displayBoard();
+        this->changePiece(this->occupiedPiece->useVal());
 
-    // Sets Position
-    sf::Vector2f pos = this->squareSpace->getPosition();
+        // Sets Position
+        sf::Vector2f const pos = this->squareSpace->getPosition();
 
-    this->occupiedPiece->setPosition(pos.x, pos.y);
+        this->occupiedPiece->setPosition(pos.x, pos.y);
+    }
+
 }
 
 Piece *Square::useOccupiedPiece() {
+    if (this->occupiedPiece == nullptr)
+        return nullptr;
+
     return this->occupiedPiece;
 }
 

@@ -4,15 +4,17 @@
 
 #include "../include/Board.h"
 
+// Default Constructor
 Board::Board() {
     std::cout << "Initializing Board \n";
     this->board = new Bitboard();
 
-    this->square = new Square[64];
+    this->square = new Square[64]; // Change to 2d array
 
     this->numPositions = new sf::Text[8];
     this->letterPositions = new sf::Text[8];
 
+    // Initialize Board State
     for (int i = 0; i < 64; i++) {
         if (i % 2 == 0)
             this->square[i].setColor(sf::Color(255, 255, 255, 255));
@@ -20,8 +22,9 @@ Board::Board() {
             this->square[i].setColor(sf::Color(0, 0, 0, 255));
     }
 
-    this->font.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/arial.ttf");
+    this->font.loadFromFile("../res/arial.ttf");
 
+    // Initialize Numbers
     for (int i = 0; i < 8; i++)
     {
         this->numPositions[i].setFont(this->font);
@@ -29,11 +32,12 @@ Board::Board() {
         this->numPositions[i].setCharacterSize(30);
     }
 
+    // Initialize Letters
     for (int i = 0; i < 8; i++)
     {
-        char letter = toascii(97 + i);
+        char const letter = toascii(97 + i);
 
-        std::cout << letter << std::endl;
+        //std::cout << letter << std::endl;
 
         this->letterPositions[i].setFont(this->font);
         this->letterPositions[i].setString(letter);
@@ -42,6 +46,7 @@ Board::Board() {
 
 }
 
+// Destructor
 Board::~Board() {
     delete [] this->square;
     delete [] this->numPositions;
@@ -68,11 +73,12 @@ void Board::displayBoard() {
     cout << endl;
 }
 
-uint64_t Board::fullInt(uint64_t numVal) {
+uint64_t Board::fullInt(uint64_t const numVal) {
     // Display message to user.
     return numVal;
 }
 
+// Starts a Normal Game
 void Board::startGame() {
     // Set White Positions
     this->square[63].changePiece(5.0f); // Rook

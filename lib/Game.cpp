@@ -31,11 +31,11 @@ void Game::openGame() {
 
     Square *squares = this->board->useBoard();
 
-    Piece *track = nullptr;
+    Square *track = nullptr;
 
     std::cout << "Track Initalized: " << track << std::endl;
 
-    CustomEvent customEvent;
+    CustomEvent customEvent(test);
 
     while (this->window.isOpen())
     {
@@ -65,17 +65,19 @@ void Game::openGame() {
             if (event.type == sf::Event::Closed)
                 this->window.close();
 
+            //customEvent.squareClickLogic(this->window, squares, track, event);
+
             if (event.type == sf::Event::MouseButtonPressed)
             {
 
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    track = customEvent.squareClickLogic(this->window, squares, track);
+                    customEvent.squareClickLogic(this->window, squares, track, event);
 
-                    if (track != nullptr) {
-                        std::cout << "Outside: " << track << std::endl;
-                    }
-                    else
-                        std::cout << "NullPTR" << std::endl;
+                    // if (track != nullptr) {
+                    //     std::cout << "Outside: " << track << std::endl;
+                    // }
+                    // else
+                    //     std::cout << " Track is NullPTR" << std::endl;
                 }
             }
 

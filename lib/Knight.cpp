@@ -8,7 +8,7 @@
 Knight::Knight() {
     this->value = 3.1f;
 
-    if (!texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+    if (!texture.loadFromFile("../res/blackKnight.png"))
     {
         // error...
         std::cout << "Error Loading Knight Texture" << std::endl;
@@ -23,7 +23,7 @@ Knight::Knight(char color) {
 
     if (color == 'w')
     {
-        if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+        if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
             // error...
             std::cout << "Error Loading Knight Texture" << std::endl;
@@ -35,7 +35,7 @@ Knight::Knight(char color) {
     }
     if (color == 'b')
     {
-        if (!this->texture.loadFromFile("/Users/crolwick/Documents/CLionProjects/Chess/res/blackKing.png"))
+        if (!this->texture.loadFromFile("../res/blackKnight.png"))
         {
             // error...
             std::cout << "Error Loading Knight Texture" << std::endl;

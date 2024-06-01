@@ -6,6 +6,7 @@
 #define CHESS_SQUARE_H
 
 #include <iostream>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 #include "Piece.h"
 
@@ -27,7 +28,7 @@ class Square {
         void echoPiece();
         void changePiece(float);
         void checkPiece();
-        bool checkClickable(sf::RenderWindow &, Piece *, float);
+        bool checkClickable(sf::RenderWindow const &, Piece *, float);
 
         void setOccupiedPiece(Piece *);
         void setColor(sf::Color);
@@ -38,7 +39,7 @@ class Square {
         float usePiece();
         Piece *useOccupiedPiece();
 
-        bool isClicked(sf::RenderWindow &);
+        bool isClicked(sf::RenderWindow const &);
 };
 
 #endif //CHESS_SQUARE_H

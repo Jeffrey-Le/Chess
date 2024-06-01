@@ -8,16 +8,19 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include "GameLogic.h"
 #include "Square.h"
 #include "Piece.h"
 
 class CustomEvent {
     private:
         sf::Event event;
+        GameLogic *logic;
     public:
         CustomEvent();
+        CustomEvent(GameLogic *&);
 
-        Piece *squareClickLogic(sf::RenderWindow &, Square *, Piece *);
+        void squareClickLogic(sf::RenderWindow const&, Square *&, Square *&, sf::Event &);
 
         sf::Event useCustomEvent();
 };
