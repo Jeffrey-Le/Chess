@@ -13,11 +13,15 @@
 #include "Pawn.h"
 #include "Knight.h"
 #include "Moves.h"
+#include "Player.h"
 
 class GameLogic {
     private:
+        //Players
+        Player *players; // 1 or 2
+
         // General Logic
-        bool playerTurn = false;
+        bool playerTurn = false; // true = player 1, false = player 2 or AI
 
         bool enPeasant = true;
 
@@ -48,9 +52,13 @@ class GameLogic {
         ~GameLogic();
 
         void getPossibleMoves(int);
+        void updateMoves(int);
 
         void displayBitboard(char, char) const;
         void revertBitboard() const;
+
+        static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);
+        static uint64_t bitwiseOr(Bitboard *&, Bitboard *&);
 
         static uint64_t bitwiseAnd(uint64_t, uint64_t);
         static uint64_t bitwiseOr(uint64_t, uint64_t);

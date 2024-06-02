@@ -97,6 +97,9 @@ void Square::setPos(float const x, float const y) const {
     this->squareSpace->setPosition(x, y);
 }
 
+void Square::setValidMove(bool const val) {
+    this->isValidMove = val;
+}
 
 sf::Vector2f Square::usePos() const {
     return this->squareSpace->getPosition();
@@ -124,25 +127,21 @@ bool Square::isClicked(sf::RenderWindow const &window) {
     if (this->squareSpace->getFillColor() != this->color)
         this->squareSpace->setFillColor(this->color);
 
-    if (this->piece == 0.0f && this->isEmpty)
-        this->isValidMove = true;
+    // if (this->piece == 0.0f && this->isEmpty)
+    //     this->isValidMove = true;
 
     return false;
 }
 
 void Square::setOccupiedPiece(Piece *newPiece) {
 
-    std::cout << newPiece << std::endl;
     if (newPiece->useVal() == 0.0f) {
         this->occupiedPiece = newPiece;
         this->changePiece(0.0f);
-        std::cout << "In Occupied Piece Nullptr" << std::endl;
-        this->isValidMove = true;
         this->isEmpty = true;
     }
     else {
         this->occupiedPiece = newPiece;
-        std::cout << "Outside SetOccupiedPiece" << std::endl;
         //this->occupiedPiece->displayBoard();
         this->changePiece(this->occupiedPiece->useVal());
 
@@ -160,4 +159,16 @@ Piece *Square::useOccupiedPiece() const {
 
     return this->occupiedPiece;
 }
+
+void Square::resetState() {
+
+    std::cout << "REsetting State" << std::endl;
+
+    this->setColor(this->color);
+
+    if (this->occupiedPiece == nullptr || this->piece == 0.0f) {
+        this->isEmpty = true;
+    }
+}
+
 

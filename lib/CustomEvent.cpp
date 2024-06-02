@@ -16,6 +16,7 @@ CustomEvent::CustomEvent(GameLogic *&existingLogic) {
 
 void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squares, Square *&trackedPiece, sf::Event &event) const{
     bool temp = false;
+
     for (int i = 0; i < 64; i++) {
         if (squares[i].isClicked(window) && squares[i].usePiece() != 0.0f) {
             // Display Blue Squares
@@ -49,7 +50,7 @@ void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squ
             }
         }
 
-
+        squares[i].resetState();
     }
 
 

@@ -33,7 +33,11 @@ class Moves {
         Moves();
         ~Moves();
 
-        void getPawnMoves(int, Bitboard *&, Square *&) const;
+        void getPawnMoves(int, Bitboard *&, Square *&, int) const;
+
+        void setWhiteP(uint64_t);
+        void setBlackP(uint64_t);
+        void setEmpty(uint64_t);
 };
 
 #endif //MOVES_H

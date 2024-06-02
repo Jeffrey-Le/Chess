@@ -29,10 +29,12 @@ class Square {
         void changePiece(float);
         void checkPiece() const;
         bool checkClickable(sf::RenderWindow const &, Piece *, float);
+        void resetState();
 
         void setOccupiedPiece(Piece *);
         void setColor(sf::Color);
         void setPos(float, float) const;
+        void setValidMove(bool);
 
         sf::Vector2f usePos() const;
         sf::RectangleShape useSquare() const;

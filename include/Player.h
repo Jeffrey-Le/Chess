@@ -10,11 +10,13 @@
 
 class Player {
     private:
-        std::string *colorString; // Player Color is Unknown until Game Starts
+        std::string colorString; // Player Color is Unknown until Game Starts
         sf::Color *color; // Color will be used to track which piece belongs to the Player
     public:
         Player();
         ~Player();
+
+        std::string getColor() const;
 };
 
 #endif //CHESS_PLAYER_H

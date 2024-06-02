@@ -4,6 +4,8 @@
 #include "../include/GameLogic.h"
 
 GameLogic::GameLogic() {
+    this->players = new Player[2];
+
     this->curBoard = nullptr;
     this->curBitboard = new Bitboard();
 
@@ -23,6 +25,8 @@ GameLogic::GameLogic() {
 }
 
 GameLogic::GameLogic(Board &board) {
+    this->players = new Player[2];
+
     this->curBoard = &board;
     this->curBitboard = new Bitboard();
 
@@ -241,7 +245,7 @@ void GameLogic::revertBitboard() const{
 }
 
 void GameLogic::getPossibleMoves(int const index) {
-    Moves const moves;
+    Moves moves;
 
     Square *squares = this->curBoard->useBoard();
 
@@ -249,7 +253,47 @@ void GameLogic::getPossibleMoves(int const index) {
 
     float const pieceVal = squares[index].usePiece();
 
-    switch (int64_t(round(pieceVal))) {
+    if (std::tolower(this->players[0].getColor().at(0)) == 'w') {
+        uint64_t notWP = bitwiseOr(this->whitePawn, this->whiteBishop);
+
+        notWP = bitwiseOr(notWP, this->whiteKing->useBitboard());
+        notWP = bitwiseOr(notWP, this->whiteKnight->useBitboard());
+        notWP = bitwiseOr(notWP, this->whiteQueen->useBitboard());
+        notWP = bitwiseOr(notWP, this->whiteRook->useBitboard());
+        notWP = bitwiseOr(notWP, this->blackKing->useBitboard());
+        moves.setWhiteP(notWP);
+
+        uint64_t BlP = bitwiseOr(this->blackBishop, this->blackQueen);
+        BlP = bitwiseOr(BlP, this->blackKnight->useBitboard());
+        BlP = bitwiseOr(BlP, this->blackPawn->useBitboard());
+        BlP = bitwiseOr(BlP, this->blackRook->useBitboard());
+        moves.setBlackP(BlP);
+
+        uint64_t const empty = ~bitwiseOr(notWP, BlP);
+        moves.setEmpty(empty);
+    }
+    if (std::tolower(this->players[0].getColor().at(0)) == 'b') {
+        uint64_t notBP = bitwiseOr(this->whitePawn, this->whiteBishop);
+
+        notBP = bitwiseOr(notBP, this->whiteKing->useBitboard());
+        notBP = bitwiseOr(notBP, this->whiteKnight->useBitboard());
+        notBP = bitwiseOr(notBP, this->whiteQueen->useBitboard());
+        notBP = bitwiseOr(notBP, this->whiteRook->useBitboard());
+        moves.setWhiteP(notBP);
+
+        uint64_t BlP = bitwiseOr(this->blackBishop, this->blackQueen);
+        BlP = bitwiseOr(BlP, this->blackKnight->useBitboard());
+        BlP = bitwiseOr(BlP, this->blackPawn->useBitboard());
+        BlP = bitwiseOr(BlP, this->blackRook->useBitboard());
+        moves.setBlackP(BlP);
+
+        uint64_t empty = bitwiseOr(notBP, BlP);
+        empty = bitwiseOr(empty, this->blackKing->useBitboard());
+        empty = ~empty;
+        moves.setEmpty(empty);
+    }
+
+    switch (int64_t(std::round(pieceVal))) {
         case 1:
         {
             std::cout << "1" << std::endl;
@@ -257,7 +301,7 @@ void GameLogic::getPossibleMoves(int const index) {
             // if (this->bitwiseAnd(possibeCapture, this->curBitboard->useBitboard()) != 0ULL)
             //     // REturn Bitboard instead and revert to display on visual board
             //     std::cout << "Can Capture" << std::endl;
-            moves.getPawnMoves(1, this->whitePawn,squares);
+            moves.getPawnMoves(1, this->whitePawn,squares, index);
             break;
         }
         case -1:
@@ -267,7 +311,7 @@ void GameLogic::getPossibleMoves(int const index) {
         case 3:
             std::cout << "3" << std::endl;
             if (pieceVal == 3.1f) {
-                moves.getPawnMoves(1, this->whitePawn,squares);
+                moves.getPawnMoves(1, this->whitePawn,squares, index);
                 this->whiteKnight->updateBitboard(Binary);
             }
             if (pieceVal == 3.2f)
@@ -304,6 +348,21 @@ void GameLogic::getPossibleMoves(int const index) {
                 this->blackKing->updateBitboard(Binary);
     }
 
+}
+
+void GameLogic::updateMoves(int index) {
+    auto *squares = this->curBoard->useBoard();
+
+
+}
+
+
+uint64_t GameLogic::bitwiseAnd(Bitboard *&board1, Bitboard *&board2) {
+    return board1->useBitboard() & board2->useBitboard();
+}
+
+uint64_t GameLogic::bitwiseOr(Bitboard *&board1, Bitboard *&board2) {
+    return board1->useBitboard() | board2->useBitboard();
 }
 
 uint64_t GameLogic::bitwiseAnd(uint64_t const board1, uint64_t const board2) {
