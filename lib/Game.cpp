@@ -42,6 +42,8 @@ void Game::openGame() {
         sf::Event event = customEvent.useCustomEvent();
         //sf::Event event; // CustomEvent
 
+       sf::Vector2i mouseCoords = sf::Mouse::getPosition(this->window);
+
         this->window.clear(sf::Color(sf::Color(0, 255, 0))); // Clears Canvas
 
         // Draw Content onto Window
@@ -67,13 +69,23 @@ void Game::openGame() {
 
             //customEvent.squareClickLogic(this->window, squares, track, event);
 
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
+            for (int i = 0; i < 64; i++) {
+                // Reset Square State
 
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    customEvent.squareClickLogic(this->window, squares, track, event);
+                // Click Logic
+                if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        customEvent.squareClickLogic(this->window, &squares[i], track, i);
+                    }
+
+                    if (event.mouseButton.button == sf::Mouse::Right) {
+                        std::cout << "Right Click" << std::endl;
+                    }
                 }
+
             }
+
 
         }
 

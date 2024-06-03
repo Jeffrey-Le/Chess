@@ -14,46 +14,45 @@ CustomEvent::CustomEvent(GameLogic *&existingLogic) {
     this->logic = existingLogic;
 }
 
-void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *& squares, Square *&trackedPiece, sf::Event &event) const{
-    bool temp = false;
+void CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *clickedSquare, Square *&trackedSquare, int const index) const{
+    std::cout << "Square is CLicked" << std::endl;
 
-    for (int i = 0; i < 64; i++) {
-        if (squares[i].isClicked(window) && squares[i].usePiece() != 0.0f) {
-            // Display Blue Squares
-            //squares[i].checkPiece();
-            trackedPiece = &squares[i];
-            std::cout << "Is Clicked is True: " << squares[i].usePiece() << std::endl;
-            trackedPiece->setOccupiedPiece(squares[i].useOccupiedPiece());
-
-            std::cout << "Tracked Piece: " << trackedPiece->usePiece() << std::endl;
-            std::cout << "Occupied Piece: " << &squares[i] << std::endl;
-
-            this->logic->getPossibleMoves(i);
-        }
-
-        if (trackedPiece != nullptr && squares[i].usePiece() == 0.0f) {
-            std::cout << "Tracked Piece not nullptr INSIDE" << std::endl;
-            temp = squares[i].checkClickable(window, trackedPiece->useOccupiedPiece(), trackedPiece->useOccupiedPiece()->useVal());
-
-            std::cout << "Temp: " << temp << std::endl;
-
-            std::cout << "Tracked Piece SEt: " << trackedPiece << std::endl;
-
-            if (temp) {
-                auto  *tempPiece = new Piece();
-                tempPiece->setValue(0.0f);
-                trackedPiece->setOccupiedPiece(tempPiece);
-                trackedPiece = nullptr;
-
-                std::cout << "Turinging Tracked Piece to NullPtr: " << trackedPiece << std::endl;
-                delete tempPiece;
-            }
-        }
-
-        squares[i].resetState();
+    if (!clickedSquare->isClicked(window))
+        emptySquareClick(clickedSquare, trackedSquare);
+    else {
+        occupiedSquareClick(clickedSquare, trackedSquare);
+        this->logic->getPossibleMoves(index);
     }
 
+}
 
+void CustomEvent::occupiedSquareClick(Square *&clickedSquare, Square *& trackedSquare) {
+    std::cout << "Not Empty" << std::endl;
+
+    clickedSquare->changeColor(sf::Color(0, 0, 175, 150));
+
+    trackedSquare = clickedSquare;
+
+}
+
+void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSquare) {
+    std::cout << "Empty" << std::endl;
+
+    if (clickedSquare->checkClickable()) {
+        clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
+        clickedSquare->changePiece(trackedSquare->useOccupiedPiece()->useVal());
+
+
+        trackedSquare->setOccupiedPiece(new Piece());
+
+        trackedSquare->resetState();
+
+        clickedSquare->resetState();
+    }
+}
+
+void  CustomEvent::resetAllSquareStates() {
+    // Reset All Square States based on GameLogic Bitboard
 }
 
 

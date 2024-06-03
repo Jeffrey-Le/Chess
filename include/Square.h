@@ -28,8 +28,11 @@ class Square {
         void echoPiece() const;
         void changePiece(float);
         void checkPiece() const;
-        bool checkClickable(sf::RenderWindow const &, Piece *, float);
+        bool checkClickable();
+
         void resetState();
+
+        void changeColor(sf::Color) const;
 
         void setOccupiedPiece(Piece *);
         void setColor(sf::Color);
