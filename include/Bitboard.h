@@ -29,6 +29,7 @@ class Bitboard {
         void updateBitboard(std::string const &);
         void displayBitboard() const;
 
+        void setBitboard(uint64_t const &);
         uint64_t useBitboard() const;
 };
 

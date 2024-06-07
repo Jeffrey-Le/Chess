@@ -45,6 +45,8 @@ class GameLogic {
         Bitboard *blackQueen;
         Bitboard *blackKing;
 
+        Bitboard *possibleMoves;
+
         void setIntialBoard() const;
     public:
         GameLogic();
@@ -52,7 +54,7 @@ class GameLogic {
         ~GameLogic();
 
         void getPossibleMoves(int);
-        void updateMoves(int);
+        void updateMoves(int, int);
 
         void displayBitboard(char, char) const;
         void revertBitboard() const;

@@ -8,7 +8,7 @@
 Knight::Knight() {
     this->value = 3.1f;
 
-    if (!texture.loadFromFile("../res/blackKnight.png"))
+    if (!texture.loadFromFile("../res/whiteKnight.png"))
     {
         // error...
         std::cout << "Error Loading Knight Texture" << std::endl;
@@ -23,7 +23,7 @@ Knight::Knight(char const color) {
 
     if (color == 'w')
     {
-        if (!this->texture.loadFromFile("../res/blackKnight.png"))
+        if (!this->texture.loadFromFile("../res/whiteKnight.png"))
         {
             // error...
             std::cout << "Error Loading Knight Texture" << std::endl;

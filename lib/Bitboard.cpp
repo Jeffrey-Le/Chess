@@ -108,6 +108,11 @@ void Bitboard::displayBitboard() const{
     std::cout << uint64_t(this->board) << std::endl;
 }
 
+void Bitboard::setBitboard(uint64_t const &newBoard) {
+    this->board = newBoard;
+}
+
+
 uint64_t Bitboard::useBitboard() const{
     return this->board;
 }

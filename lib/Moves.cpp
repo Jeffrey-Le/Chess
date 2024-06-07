@@ -95,6 +95,8 @@ void Moves::getPawnMoves(int val, Bitboard *&board, Square *&squares, int index)
             std::cout << "Pawn Move Forward 1 Promotion" << std::endl;
         }
     }
+
+    board->setBitboard(pawnMoves);
 }
 
 void Moves::setWhiteP(uint64_t const board) {

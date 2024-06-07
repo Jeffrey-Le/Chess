@@ -69,22 +69,28 @@ void Game::openGame() {
 
             //customEvent.squareClickLogic(this->window, squares, track, event);
 
+            bool temp = false;
+
             for (int i = 0; i < 64; i++) {
                 // Reset Square State
-
                 // Click Logic
                 if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
                 {
                     if (event.mouseButton.button == sf::Mouse::Left) {
-                        customEvent.squareClickLogic(this->window, &squares[i], track, i);
+                        temp = customEvent.squareClickLogic(this->window, &squares[i], track, i);
                     }
 
                     if (event.mouseButton.button == sf::Mouse::Right) {
                         std::cout << "Right Click" << std::endl;
                     }
                 }
-
             }
+
+            for (int i = 0; i < 64; i++) {
+                if (temp)
+                    squares[i].resetState();
+            }
+
 
 
         }
