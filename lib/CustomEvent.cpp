@@ -20,15 +20,7 @@ bool CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *click
     if (!clickedSquare->isClicked(window)) {
 
         uint64_t const diffIndex = trackedSquare - clickedSquare;
-        int temp = 0;
-
-        std::cout << "Difference Index: " << diffIndex << std::endl;
-
-        if (diffIndex < 0) {
-            temp = index - diffIndex;
-        }
-        else
-            temp = index + diffIndex;
+        int const temp = index + diffIndex;
 
         emptySquareClick(clickedSquare, trackedSquare);
         this->logic->updateMoves(index, temp);

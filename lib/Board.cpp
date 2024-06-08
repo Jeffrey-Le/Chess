@@ -78,8 +78,8 @@ void Board::startGame() const {
     this->square[57].changePiece(3.1f); // Knight
     this->square[61].changePiece(3.2f); // Bishop
     this->square[58].changePiece(3.2f); // Bishop
-    this->square[60].changePiece(9.0f); // Queen
-    this->square[59].changePiece(0.1f); // King
+    this->square[59].changePiece(9.0f); // Queen
+    this->square[60].changePiece(0.1f); // King
     for (int i = 48; i < 56; i++)
         this->square[i].changePiece(1.0f); // Pawn
 

@@ -9,6 +9,7 @@
 #include <cstdint>
 
 #include "Bitboard.h"
+#include "Pawn.h"
 
 class Moves {
     private:

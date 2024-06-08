@@ -34,6 +34,9 @@ Pawn::Pawn(char const color) {
         }
     if (color == 'b')
     {
+
+        this->value *= -1;
+
         if (!this->texture.loadFromFile("../res/blackPawn.png"))
         {
             // ERROR
@@ -46,4 +49,19 @@ Pawn::Pawn(char const color) {
     }
 
     this->pieceBoard = new uint64_t(0);
+}
+
+Pawn::~Pawn() {
+
+}
+
+bool Pawn::checkFirstMove() {
+    if (this->firstMove)
+        return true;
+
+    return false;
+}
+
+void Pawn::setFirstMove() {
+    this->firstMove = false;
 }

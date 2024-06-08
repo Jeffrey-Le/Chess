@@ -20,7 +20,7 @@ class Piece {
     public:
         Piece();
         explicit Piece(uint64_t*);
-        ~Piece();
+        virtual ~Piece();
 
         void setPosition(float, float);
 

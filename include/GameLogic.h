@@ -12,6 +12,11 @@
 
 #include "Pawn.h"
 #include "Knight.h"
+#include "King.h"
+#include "Queen.h"
+#include "Rook.h"
+#include "Bishop.h"
+
 #include "Moves.h"
 #include "Player.h"
 
@@ -55,6 +60,7 @@ class GameLogic {
 
         void getPossibleMoves(int);
         void updateMoves(int, int);
+        void updateBoard(Board *&) const;
 
         void displayBitboard(char, char) const;
         void revertBitboard() const;

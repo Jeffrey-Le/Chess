@@ -9,10 +9,15 @@
 
 class Pawn : public Piece {
     private:
-        bool firstMove = false;
+        bool firstMove = true;
     public:
         Pawn();
         explicit Pawn(char);
+        ~Pawn() override;
+
+        bool checkFirstMove();
+
+    void setFirstMove();
 
 };
 

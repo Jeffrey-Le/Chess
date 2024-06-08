@@ -82,92 +82,107 @@ void GameLogic::setIntialBoard() const {
         switch (int64_t(round(pieceVal))) {
             case 1:
                 std::cout << "1" << std::endl;
-                this->whitePawn->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Pawn('w'));
+            this->whitePawn->updateBitboard(Binary);
+            squares[i].setOccupiedPiece(new Pawn('w'));
 
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whitePawn->useBitboard());
+            this->curBitboard->updateBitboard(Binary);
+            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whitePawn->useBitboard());
 
-                break;
+            break;
             case -1:
                 std::cout << "-1" << std::endl;
-                this->blackPawn->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Pawn('b'));
+            this->blackPawn->updateBitboard(Binary);
+            squares[i].setOccupiedPiece(new Pawn('b'));
 
+            this->curBitboard->updateBitboard(Binary);
+            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackPawn->useBitboard());
 
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackPawn->useBitboard());
-
-                break;
+            break;
             case 3:
                 std::cout << "3" << std::endl;
-                if (pieceVal == 3.1f) {
-                    this->whiteKnight->updateBitboard(Binary);
-                    squares[i].setOccupiedPiece(new Knight('w'));
+            if (pieceVal == 3.1f) {
+                this->whiteKnight->updateBitboard(Binary);
+                squares[i].setOccupiedPiece(new Knight('w'));
 
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteKnight->useBitboard());
 
-                    this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteKnight->useBitboard());
+            }
+            if (pieceVal == 3.2f) {
+                this->whiteBishop->updateBitboard(Binary);
+                squares[i].setOccupiedPiece(new Bishop('w'));
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteBishop->useBitboard());
 
-                }
-                if (pieceVal == 3.2f) {
-                    this->whiteBishop->updateBitboard(Binary);
-
-                    this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteBishop->useBitboard());
-
-                }
-                break;
-            case -3:
+            }
+            break;
+            case -3: {
                 std::cout << "-3" << std::endl;
                 if (pieceVal == -3.1f) {
                     this->blackKnight->updateBitboard(Binary);
                     squares[i].setOccupiedPiece(new Knight('b'));
-
-                    this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKnight->useBitboard());
+                    this->curBitboard->updateBitboard(Binary);
+                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKnight->useBitboard());
 
                 }
-                if (pieceVal == -3.2f)
+                if (pieceVal == -3.2f) {
                     this->blackBishop->updateBitboard(Binary);
-
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackBishop->useBitboard());
+                    squares[i].setOccupiedPiece(new Bishop('b'));
+                }
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackBishop->useBitboard());
 
                 break;
-            case 5:
+            }
+            case 5: {
                 std::cout << "5" << std::endl;
-                this->whiteRook->updateBitboard(Binary);
+            this->whiteRook->updateBitboard(Binary);
+                squares[i].setOccupiedPiece(new Rook('w'));
+            this->curBitboard->updateBitboard(Binary);
+            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteRook->useBitboard());
 
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteRook->useBitboard());
-
-                break;
-            case -5:
+            break;
+        }
+            case -5: {
                 std::cout << "-5" << std::endl;
                 this->blackRook->updateBitboard(Binary);
-
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackRook->useBitboard());
+                squares[i].setOccupiedPiece(new Rook('b'));
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackRook->useBitboard());
 
                 break;
-            case 9:
+            }
+            case 9: {
                 std::cout << "9" << std::endl;
                 this->whiteQueen->updateBitboard(Binary);
-
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteQueen->useBitboard());
+                squares[i].setOccupiedPiece(new Queen('w'));
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteQueen->useBitboard());
 
                 break;
-            case -9:
+            }
+            case -9: {
                 std::cout << "-9" << std::endl;
                 this->blackQueen->updateBitboard(Binary);
-
-                this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackQueen->useBitboard());
+                squares[i].setOccupiedPiece(new Queen('b'));
+                this->curBitboard->updateBitboard(Binary);
+                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackQueen->useBitboard());
 
                 break;
+            }
             default:
                 std::cout << "default" << std::endl;
                 if (pieceVal == 0.1f) {
                     this->whiteKing->updateBitboard(Binary);
-
-                    this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
+                    squares[i].setOccupiedPiece(new King('w'));
+                    this->curBitboard->updateBitboard(Binary);
+                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
                 }
                 if (pieceVal == -0.1f) {
                     this->blackKing->updateBitboard(Binary);
-
-                    this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
+                    squares[i].setOccupiedPiece(new King('b'));
+                    this->curBitboard->updateBitboard(Binary);
+                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
 
                 }
         }
@@ -397,13 +412,7 @@ void GameLogic::getPossibleMoves(int const index) {
 void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     auto const *squares = this->curBoard->useBoard();
 
-    uint64_t temp = this->possibleMoves->useBitboard() & (1ULL << clickedIndex);
-
-    uint64_t newBoard = this->curBitboard->useBitboard() | temp;
-
-    temp = ~(1ULL << trackedIndex);
-
-    newBoard &= temp;
+    uint64_t const newBoard = this->curBitboard->useBitboard() | bitwiseAnd(this->possibleMoves->useBitboard(), (1ULL << clickedIndex)) & ~(1ULL << trackedIndex);
 
     std::cout << "New Board: " << newBoard << std::endl;
 
@@ -413,7 +422,13 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
         }
     }
 
+
 }
+
+void GameLogic::updateBoard(Board *&board) const {
+    this->curBoard->setSquares(board->useBoard());
+}
+
 
 
 uint64_t GameLogic::bitwiseAnd(Bitboard *&board1, Bitboard *&board2) {

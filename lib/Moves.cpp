@@ -50,17 +50,24 @@ void Moves::getPawnMoves(int val, Bitboard *&board, Square *&squares, int index)
         }
     }
 
+    // Guarenteed to be a Pawn Dervied Class
+    Pawn* pawn = dynamic_cast<Pawn*>(squares[index].useOccupiedPiece());
+
     // Move 2 Square
-    // board >> 16  && EMPTY && ~RANK8
-    pawnMoves |= (BITBOARD >> 16) & this->EMPTY & ~this->RANK_8 & ~this->FILE_H;
-    for (int i = 0; i < 64; i++) {
-        if (((pawnMoves >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(0, 255, 0));
-            squares[i].setValidMove(true);
-            std::cout << "Pawn Move Forward 2" << std::endl;
+    // board >> 16  && EMPTY && ~RANK8 && ~FILEH
+    if (pawn->checkFirstMove()) {
+        pawn->setFirstMove();
+        std::cout << "Two Spaces" << std::endl;
+
+        pawnMoves |= (BITBOARD >> 16) & this->EMPTY & ~this->RANK_8 & ~this->FILE_H;
+        for (int i = 0; i < 64; i++) {
+            if (((pawnMoves >> i) & 1) == 1) {
+                squares[i].changeColor(sf::Color(0, 255, 0));
+                squares[i].setValidMove(true);
+                std::cout << "Pawn Move Forward 2" << std::endl;
+            }
         }
     }
-
     // -- Promotions --
 
     // Promotion while Capture Right

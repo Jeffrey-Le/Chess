@@ -82,6 +82,8 @@ void Game::openGame() {
 
                     if (event.mouseButton.button == sf::Mouse::Right) {
                         std::cout << "Right Click" << std::endl;
+
+                        squares[i].changeColor(sf::Color(50, 255, 50));
                     }
                 }
             }
@@ -89,6 +91,10 @@ void Game::openGame() {
             for (int i = 0; i < 64; i++) {
                 if (temp)
                     squares[i].resetState();
+            }
+
+            if (temp) {
+                test->updateBoard(this->board);
             }
 
 
