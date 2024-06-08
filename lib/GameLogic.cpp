@@ -3,25 +3,22 @@
 //
 #include "../include/GameLogic.h"
 
+#include <memory>
+
+
 GameLogic::GameLogic() {
     this->players = new Player[2];
 
     this->curBoard = nullptr;
     this->curBitboard = new Bitboard();
 
-    this->whitePawn = new Bitboard();
-    this->whiteRook = new Bitboard();
-    this->whiteKnight = new Bitboard();
-    this->whiteBishop = new Bitboard();
-    this->whiteQueen = new Bitboard();
-    this->whiteKing = new Bitboard();
+    float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
-    this->blackPawn = new Bitboard();
-    this->blackRook = new Bitboard();
-    this->blackKnight = new Bitboard();
-    this->blackBishop = new Bitboard();
-    this->blackQueen = new Bitboard();
-    this->blackKing = new Bitboard();
+    for (auto i = 0; i < 6; i++) {
+        this->bitBoards[values[i]] = new Bitboard();
+        this->bitBoards[-values[i]] = new Bitboard();
+    }
+
 }
 
 GameLogic::GameLogic(Board &board) {
@@ -30,21 +27,12 @@ GameLogic::GameLogic(Board &board) {
     this->curBoard = &board;
     this->curBitboard = new Bitboard();
 
-    // Initialize White Bitboards
-    this->whitePawn = new Bitboard();
-    this->whiteRook = new Bitboard();
-    this->whiteKnight = new Bitboard();
-    this->whiteBishop = new Bitboard();
-    this->whiteQueen = new Bitboard();
-    this->whiteKing = new Bitboard();
+    float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
-    // Initialize Black Bitboards
-    this->blackPawn = new Bitboard();
-    this->blackRook = new Bitboard();
-    this->blackKnight = new Bitboard();
-    this->blackBishop = new Bitboard();
-    this->blackQueen = new Bitboard();
-    this->blackKing = new Bitboard();
+    for (auto i = 0; i < 6; i++) {
+        this->bitBoards[values[i]] = new Bitboard();
+        this->bitBoards[-values[i]] = new Bitboard();
+    }
 
     this->setIntialBoard();
 }
@@ -53,21 +41,27 @@ GameLogic::~GameLogic() {
     delete this->curBoard;
 
     // Free Piece Bitboard memory space
-    delete this->whitePawn;
-    delete this->whiteRook;
-    delete this->whiteKnight;
-    delete this->whiteBishop;
-    delete this->whiteQueen;
-    delete this->whiteKing;
-    delete this->blackPawn;
-    delete this->blackRook;
-    delete this->blackKnight;
-    delete this->blackBishop;
-    delete this->blackQueen;
-    delete this->blackKing;
+    for (auto & bitBoard : this->bitBoards)
+        delete bitBoard.second;
+
+    this->bitBoards.clear();
 }
 
-void GameLogic::setIntialBoard() const {
+void GameLogic::setIntialBoard() {
+    // std::unordered_map<float, std::function<std::shared_ptr<Piece>()>> PieceInfo = {
+    //     {1.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Pawn>('w');}},
+    //     {3.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<Knight>('w');}},
+    //     {3.2f, []() -> std::shared_ptr<Piece> { return std::make_shared<Bishop>('w');}},
+    //     {5.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Rook>('w');}},
+    //     { 9.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Queen>('w');}},
+    //     {0.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<King>('w');}},
+    //     {-1.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Pawn>('b');}},
+    //     {-3.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<Knight>('b');}},
+    //     {-3.2f, []() -> std::shared_ptr<Piece> { return std::make_shared<Bishop>('b');}},
+    //     {-5.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Rook>('b');}},
+    //     { -9.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Queen>('b');}},
+    //     {-0.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<King>('b');}},
+    // };
 
     Square *squares = this->curBoard->useBoard();
 
@@ -79,179 +73,64 @@ void GameLogic::setIntialBoard() const {
         Binary = Binary.substr(i+1)+"1"+Binary.substr(0, i);
         float const pieceVal = squares[i].usePiece();
 
-        switch (int64_t(round(pieceVal))) {
-            case 1:
-                std::cout << "1" << std::endl;
-            this->whitePawn->updateBitboard(Binary);
-            squares[i].setOccupiedPiece(new Pawn('w'));
+
+        if (pieceVal != 0.0f) {
+            std::unordered_map<float, Piece*> PieceInfo = {
+                {1.0f, new Pawn('w')},
+                {3.1f, new Knight('w')},
+                {3.2f, new Bishop('w')},
+                {5.0f, new Rook('w')},
+                { 9.0f, new Queen('w')},
+                {0.1f, new King('w')},
+                {-1.0f, new Pawn('b')},
+                {-3.1f, new Knight('b')},
+                {-3.2f, new Bishop('b')},
+                {-5.0f, new Rook('b')},
+                { -9.0f, new Queen('b')},
+                {-0.1f, new King('b')},
+            };
+
+            std::cout << "PieceVal: " << pieceVal << std::endl;
+
+            this->bitBoards[pieceVal]->updateBitboard(Binary);
+
+            squares[i].setOccupiedPiece(PieceInfo[pieceVal]);
 
             this->curBitboard->updateBitboard(Binary);
-            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whitePawn->useBitboard());
-
-            break;
-            case -1:
-                std::cout << "-1" << std::endl;
-            this->blackPawn->updateBitboard(Binary);
-            squares[i].setOccupiedPiece(new Pawn('b'));
-
-            this->curBitboard->updateBitboard(Binary);
-            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackPawn->useBitboard());
-
-            break;
-            case 3:
-                std::cout << "3" << std::endl;
-            if (pieceVal == 3.1f) {
-                this->whiteKnight->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Knight('w'));
-
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteKnight->useBitboard());
-
-            }
-            if (pieceVal == 3.2f) {
-                this->whiteBishop->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Bishop('w'));
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteBishop->useBitboard());
-
-            }
-            break;
-            case -3: {
-                std::cout << "-3" << std::endl;
-                if (pieceVal == -3.1f) {
-                    this->blackKnight->updateBitboard(Binary);
-                    squares[i].setOccupiedPiece(new Knight('b'));
-                    this->curBitboard->updateBitboard(Binary);
-                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKnight->useBitboard());
-
-                }
-                if (pieceVal == -3.2f) {
-                    this->blackBishop->updateBitboard(Binary);
-                    squares[i].setOccupiedPiece(new Bishop('b'));
-                }
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackBishop->useBitboard());
-
-                break;
-            }
-            case 5: {
-                std::cout << "5" << std::endl;
-            this->whiteRook->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Rook('w'));
-            this->curBitboard->updateBitboard(Binary);
-            //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteRook->useBitboard());
-
-            break;
         }
-            case -5: {
-                std::cout << "-5" << std::endl;
-                this->blackRook->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Rook('b'));
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackRook->useBitboard());
-
-                break;
-            }
-            case 9: {
-                std::cout << "9" << std::endl;
-                this->whiteQueen->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Queen('w'));
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->whiteQueen->useBitboard());
-
-                break;
-            }
-            case -9: {
-                std::cout << "-9" << std::endl;
-                this->blackQueen->updateBitboard(Binary);
-                squares[i].setOccupiedPiece(new Queen('b'));
-                this->curBitboard->updateBitboard(Binary);
-                //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackQueen->useBitboard());
-
-                break;
-            }
-            default:
-                std::cout << "default" << std::endl;
-                if (pieceVal == 0.1f) {
-                    this->whiteKing->updateBitboard(Binary);
-                    squares[i].setOccupiedPiece(new King('w'));
-                    this->curBitboard->updateBitboard(Binary);
-                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
-                }
-                if (pieceVal == -0.1f) {
-                    this->blackKing->updateBitboard(Binary);
-                    squares[i].setOccupiedPiece(new King('b'));
-                    this->curBitboard->updateBitboard(Binary);
-                    //this->curBitboard->setBitboard(this->curBitboard->useBitboard() | this->blackKing->useBitboard());
-
-                }
-        }
-    //this->curBitboard->updateBitboard(Binary); // Updates Game Board State
     }
 }
 
-void GameLogic::displayBitboard(char const name, char const color) const {
+void GameLogic::displayBitboard(char const name, char const color) {
+    std::unordered_map<std::string, float> PieceInfo = {
+        {"pw", 1.0f},
+        {"nw", 3.1f},
+        {"bw", 3.2f},
+        {"rw", 5.0f},
+        {"qw", 9.0f},
+        {"kw", 0.1f},
+        {"pb", -1.0f},
+        {"nb", -3.1f},
+        {"bb", -3.2f},
+        {"rb", -5.0f},
+        {"qb", -9.0f},
+        {"kb", -0.1f}
+    };
 
-    if (color == 'w')
-    {
-    switch (std::tolower(name)) {
-        case 'p':
-            std::cout << "WhitePawn Bitboard:" << std::endl;
-            this->whitePawn->displayBitboard();
-            break;
-        case 'n':
-            std::cout << "WhiteKnight Bitboard:" << std::endl;
-            this->whiteKnight->displayBitboard();
-            break;
-        case 'b':
-            std::cout << "WhiteBishop Bitboard:" << std::endl;
-            this->whiteBishop->displayBitboard();
-            break;
-        case 'r':
-            std::cout << "WhiteRook Bitboard:" << std::endl;
-            this->whiteRook->displayBitboard();
-            break;
-        case 'q':
-            std::cout << "WhiteQueen Bitboard:" << std::endl;
-            this->whiteQueen->displayBitboard();
-            break;
-        case 'k':
-            std::cout << "WhiteKing Bitboard:" << std::endl;
-            this->whiteKing->displayBitboard();
-            break;
-        default:
-            std::cout << "NO PIECE CHARACTER INPUTTED" << std::endl; // Error
-        }
+    if (color == 'w') {
+        std::string key = std::to_string(std::tolower(name) + 'w');
+
+        float const pieceVal = PieceInfo[key];
+
+        this->bitBoards[pieceVal]->displayBitboard();
     }
-    if (color == 'b') {
-        switch (std::tolower(name)) {
-            case 'p':
-                std::cout << "BlackPawn Bitboard:" << std::endl;
-                this->blackPawn->displayBitboard();
-                break;
-            case 'n':
-                std::cout << "BlackKnight Bitboard:" << std::endl;
-                this->blackKnight->displayBitboard();
-                break;
-            case 'b':
-                std::cout << "BlackBishop Bitboard:" << std::endl;
-                this->blackBishop->displayBitboard();
-                break;
-            case 'r':
-                std::cout << "BlackRook Bitboard:" << std::endl;
-                this->blackRook->displayBitboard();
-                break;
-            case 'q':
-                std::cout << "BlackQueen Bitboard:" << std::endl;
-                this->blackQueen->displayBitboard();
-                break;
-            case 'k':
-                std::cout << "BlackKing Bitboard" << std::endl;
-                this->blackKing->displayBitboard();
-                break;
-            default:
-                std::cout << "NO PIECE CHARACTER INPUTTED" << std::endl; // Error
-        }
+
+    if (color == 'w') {
+        std::string key = std::to_string(std::tolower(name) + 'b');
+
+        float const pieceVal = PieceInfo[key];
+
+        this->bitBoards[pieceVal]->displayBitboard();
     }
 
     if (color != 'w' && color != 'b')

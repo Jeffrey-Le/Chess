@@ -6,6 +6,9 @@
 #define CHESS_GAMELOGIC_H
 
 #include <cstdint>
+#include <unordered_map>
+#include <functional>
+#include <memory>
 
 #include "Bitboard.h"
 #include "Board.h"
@@ -36,6 +39,8 @@ class GameLogic {
         Bitboard *curBitboard;
 
         // Initialize Bitboards for each Piece
+        std::unordered_map<float, Bitboard*> bitBoards;
+
         Bitboard *whitePawn;
         Bitboard *whiteRook;
         Bitboard *whiteKnight;
@@ -52,7 +57,7 @@ class GameLogic {
 
         Bitboard *possibleMoves;
 
-        void setIntialBoard() const;
+        void setIntialBoard();
     public:
         GameLogic();
         explicit GameLogic(Board &);
@@ -62,7 +67,7 @@ class GameLogic {
         void updateMoves(int, int);
         void updateBoard(Board *&) const;
 
-        void displayBitboard(char, char) const;
+        void displayBitboard(char, char);
         void revertBitboard() const;
 
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);

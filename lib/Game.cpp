@@ -37,6 +37,8 @@ void Game::openGame() {
 
     CustomEvent customEvent(test);
 
+    test->displayBitboard('p', 'w');
+
     while (this->window.isOpen())
     {
         sf::Event event = customEvent.useCustomEvent();
