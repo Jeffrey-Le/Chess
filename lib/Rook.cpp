@@ -35,6 +35,7 @@ Rook::Rook(char const color) {
     }
     if (color == 'b')
     {
+        this->isWhite = false;
         this->value *= -1;
 
         if (!this->texture.loadFromFile("../res/blackRook.png"))

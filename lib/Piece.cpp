@@ -10,9 +10,11 @@ Piece::Piece() {
     this->value = 0;
 }
 
-Piece::Piece(uint64_t *bitBoard) {
+
+Piece::Piece(uint64_t *bitBoard, bool isWhite) {
     this->pieceBoard = bitBoard;
     this->value = 0;
+    this->isWhite = isWhite;
 }
 
 Piece::~Piece() {
@@ -61,4 +63,11 @@ float Piece::useVal() const{
 
 void Piece::displayBoard() const{
     std::cout << *this->pieceBoard << "\n";
+}
+
+bool Piece::checkWhite() {
+    if (this->isWhite)
+        return true;
+
+    return false;
 }

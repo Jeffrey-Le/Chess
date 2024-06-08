@@ -39,40 +39,6 @@ void Square::changePiece(float const changedPiece) {
     this->isEmpty = false;
 }
 
-void Square::checkPiece() const{
-    switch (int(std::floor(this->piece)))
-    {
-        case 1:
-            // Pawn
-            std::cout << "Pawn" << std::endl;
-            break;
-        case 3:
-            if (this->piece == 3.1f)
-            {
-                // Knight
-                std::cout << "Knight" << std::endl;
-            }
-            else
-            {
-                // Bishop
-                std::cout << "Bishop" << std::endl;
-            }
-            break;
-        case 5:
-            // Rook
-            std::cout << "Rook" << std::endl;
-            break;
-        case 9:
-            // Queen
-            std::cout << "Queen" << std::endl;
-            break;
-        default:
-            // King
-            std::cout << "King" << std::endl;
-    }
-}
-
-
 bool Square::checkClickable() {
     if (this->isValidMove) {
         this->isValidMove = false;
@@ -115,28 +81,10 @@ float Square::usePiece() const {
 }
 
 bool Square::isClicked(sf::RenderWindow const &window) {
-
     if (!this->isEmpty)
         return true;
 
     return false;
-
-    // sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
-    //
-    // // Means a Piece is on the board
-    // if (this->squareSpace->getGlobalBounds().contains(mouseCoords.x, mouseCoords.y) && !this->isValidMove && !this->isEmpty) {
-    //     std::cout << "Square in IsClicked" << std::endl;
-    //     this->squareSpace->setFillColor(sf::Color(0, 0, 175, 150));
-    //     return true;
-    // }
-    //
-    // if (this->squareSpace->getFillColor() != this->color)
-    //     this->squareSpace->setFillColor(this->color);
-    //
-    // // if (this->piece == 0.0f && this->isEmpty)
-    // //     this->isValidMove = true;
-    //
-    // return false;
 }
 
 void Square::setOccupiedPiece(Piece *newPiece) {

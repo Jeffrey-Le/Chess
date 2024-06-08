@@ -34,6 +34,7 @@ Bishop::Bishop(char const color) {
     }
     if (color == 'b')
     {
+        this->isWhite = false;
         this->value *= -1;
 
         if (!this->texture.loadFromFile("../res/blackBishop.png"))

@@ -68,7 +68,7 @@ class GameLogic {
         void updateBoard(Board *&) const;
 
         void displayBitboard(char, char);
-        void revertBitboard() const;
+        void revertBitboard();
 
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);
         static uint64_t bitwiseOr(Bitboard *&, Bitboard *&);
