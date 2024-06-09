@@ -24,8 +24,6 @@ class CustomEvent {
         static void occupiedSquareClick(Square *&, Square *&);
         static void emptySquareClick(Square *&, Square *&) ;
 
-        void resetAllSquareStates();
-
         sf::Event useCustomEvent() const;
 };
 

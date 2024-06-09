@@ -6,12 +6,18 @@
 #define KING_H
 
 #include "Piece.h"
+#include "Pawn.h"
 
-class King : public Piece {
+class King : public Pawn {
+    private:
+        bool inCheck = false;
     public:
         King();
         explicit King(char);
         ~King() override;
+
+        bool isCheck() const;
+        void setCheck();
 };
 
 #endif //KING_H

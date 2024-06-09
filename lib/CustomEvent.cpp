@@ -54,19 +54,9 @@ void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSqua
 
     if (clickedSquare->checkClickable()) {
         clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
-        //clickedSquare->changePiece(trackedSquare->useOccupiedPiece()->useVal());
 
         trackedSquare->setOccupiedPiece(new Piece());
-
-        //
-        // trackedSquare->resetState();
-        //
-        // clickedSquare->resetState();
     }
-}
-
-void  CustomEvent::resetAllSquareStates() {
-    // Reset All Square States based on GameLogic Bitboard
 }
 
 

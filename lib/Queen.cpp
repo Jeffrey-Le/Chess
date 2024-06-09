@@ -15,7 +15,6 @@ Queen::Queen() {
     }
 
     this->sprite.setTexture(this->texture);
-    this->pieceBoard = new uint64_t(0x4200000000000000);
 }
 
 Queen::Queen(char const color) {
@@ -30,7 +29,6 @@ Queen::Queen(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x4200000000000000);
         return;
     }
     if (color == 'b')
@@ -45,13 +43,11 @@ Queen::Queen(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x42);
         return;
     }
 
     //0000000000000000000000000000000000000000000000000000000010000010
 
-    this->pieceBoard = new uint64_t(0);
 }
 
 Queen::~Queen() {

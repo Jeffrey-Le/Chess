@@ -107,7 +107,7 @@ Piece *Square::useOccupiedPiece() const {
 
 void Square::resetState() {
 
-    std::cout << "Resetting State" << std::endl;
+    //std::cout << "Resetting State" << std::endl;
 
     this->setColor(this->color);
 

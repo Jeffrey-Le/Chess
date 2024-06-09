@@ -14,7 +14,6 @@ Pawn::Pawn() {
     }
 
     this->sprite.setTexture(this->texture);
-    this->pieceBoard = new uint64_t(0x00ff000000000000);
 }
 
 Pawn::Pawn(char const color) {
@@ -29,7 +28,6 @@ Pawn::Pawn(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x00ff000000000000);
         return;
         }
     if (color == 'b')
@@ -44,11 +42,9 @@ Pawn::Pawn(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x000000000000ff00);
         return;
     }
 
-    this->pieceBoard = new uint64_t(0);
 }
 
 Pawn::~Pawn() {

@@ -11,6 +11,7 @@ GameLogic::GameLogic() {
 
     this->curBoard = nullptr;
     this->curBitboard = new Bitboard();
+    this->possibleMoves = new Bitboard();
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -26,6 +27,8 @@ GameLogic::GameLogic(Board &board) {
 
     this->curBoard = &board;
     this->curBitboard = new Bitboard();
+
+    this->possibleMoves = new Bitboard();
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -187,7 +190,7 @@ void GameLogic::getPossibleMoves(int const index) {
 
     Square *squares = this->curBoard->useBoard();
 
-    std::string const Binary = "000ULL";
+    std::string const Binary = "0ULL";
 
     float const pieceVal = squares[index].usePiece();
 
@@ -195,9 +198,6 @@ void GameLogic::getPossibleMoves(int const index) {
         uint64_t notWP = this->bitBoards[pieceVal]->useBitboard();
 
         for (auto & bitBoard : this->bitBoards) {
-            if (bitBoard.first == 1.0f)
-                continue;
-
             if (bitBoard.first > 0.0f)
                 notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
         }
@@ -206,7 +206,7 @@ void GameLogic::getPossibleMoves(int const index) {
 
         moves.setWhiteP(notWP);
 
-        uint64_t BlP = this->bitBoards[1.0f]->useBitboard();
+        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
 
         for (auto & bitBoard : this->bitBoards) {
             if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
@@ -222,45 +222,56 @@ void GameLogic::getPossibleMoves(int const index) {
         moves.setEmpty(empty);
     }
 
-    this->possibleMoves = this->bitBoards[pieceVal];
+    this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
 
     std::unordered_map<float, std::function<void()>> map = {
-        {1.0f, [moves, this, &squares, index]() {moves.getPawnMoves(1, this->possibleMoves, squares, index);}},
-        {}
+        {1.0f, [moves, this, &squares, index]() {moves.getPawnMoves(index, this->possibleMoves, squares);}},
+        {3.1f, [moves, this, &squares, index]() {moves.getKnightMoves(index, this->possibleMoves, squares);}},
+        {3.2f, [moves, this, &squares, index]() {moves.getBishopMoves(index, this->possibleMoves, squares);}},
+        {5.0f, [moves, this, &squares, index]() {moves.getRookMoves(index, this->possibleMoves, squares);}}
     };
 
-    std::cout << float(pieceVal) <<std::endl;
+    std::cout << this->possibleMoves->useBitboard() <<std::endl;
 
-    map[pieceVal]();
+    map[std::abs(pieceVal)]();
 
 }
 
 void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     auto const *squares = this->curBoard->useBoard();
 
-    std::cout << this->possibleMoves->useBitboard() << std::endl;
+    float const pieceVal = squares[clickedIndex].usePiece();
 
-    uint64_t const newBoard = (this->curBitboard->useBitboard() | bitwiseAnd(this->possibleMoves->useBitboard(), (1ULL << clickedIndex))) & ~(1ULL << trackedIndex);
+    // Masks for the Old Square and New Square
+    uint64_t const newSpaceMask = 1ULL << clickedIndex;
+    uint64_t const oldSpaceMask = bitwiseNot(1ULL << trackedIndex);
 
-    std::cout << "New Board: " << newBoard << std::endl;
+    // Sets the new Game State Bitboard
+    uint64_t const newBoardMask = bitwiseOr(this->curBitboard->useBitboard(), bitwiseAnd(this->possibleMoves->useBitboard(), newSpaceMask));
+    uint64_t const newBoard = bitwiseAnd(newBoardMask, oldSpaceMask);
 
     this->curBitboard->setBitboard(newBoard);
 
-    for (int i = 0; i < 64; i++) {
-        if (((newBoard >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(50, 255, 50));
-        }
-    }
+    std::cout << "New Board: " << newBoard << std::endl;
 
+    // Sets the new Bitboard to the Piece
+    uint64_t const newPieceBoardMask = bitwiseOr(this->bitBoards[pieceVal]->useBitboard(), newSpaceMask);
+    uint64_t const newPieceBoard = bitwiseAnd(newPieceBoardMask, oldSpaceMask);
 
+    this->bitBoards[pieceVal]->setBitboard(newPieceBoard);
+
+    std::cout << "New PieceVal Board: " << newPieceBoard << std::endl;
+
+    this->revertBitboard();
 }
 
-void GameLogic::updateBoard(Board *&board) const {
-    this->curBoard->setSquares(board->useBoard());
+void GameLogic::updateBoard(Board *&board) {
+    this->curBoard = board;
+    //this->curBoard->setSquares(board->useBoard());
 }
 
 
-
+// Bitwise Operations
 uint64_t GameLogic::bitwiseAnd(Bitboard *&board1, Bitboard *&board2) {
     return board1->useBitboard() & board2->useBitboard();
 }
@@ -269,8 +280,16 @@ uint64_t GameLogic::bitwiseOr(Bitboard *&board1, Bitboard *&board2) {
     return board1->useBitboard() | board2->useBitboard();
 }
 
+uint64_t GameLogic::bitwiseNot(Bitboard *&board) {
+    return ~board->useBitboard();
+}
+
 uint64_t GameLogic::bitwiseAnd(uint64_t const board1, uint64_t const board2) {
     return board1 & board2;
+}
+
+uint64_t GameLogic::bitwiseNot(uint64_t const board) {
+    return ~board;
 }
 
 uint64_t GameLogic::bitwiseOr(uint64_t const board1, uint64_t const board2) {

@@ -96,6 +96,7 @@ void Game::openGame() {
             }
 
             if (temp) {
+                std::cout << "Updating Board" << std::endl;
                 test->updateBoard(this->board);
             }
 

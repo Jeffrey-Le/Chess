@@ -15,7 +15,6 @@ King::King() {
     }
 
     this->sprite.setTexture(this->texture);
-    this->pieceBoard = new uint64_t(0x4200000000000000);
 }
 
 King::King(char const color) {
@@ -30,7 +29,6 @@ King::King(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x4200000000000000);
         return;
     }
     if (color == 'b')
@@ -45,15 +43,25 @@ King::King(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x42);
         return;
     }
 
     //0000000000000000000000000000000000000000000000000000000010000010
 
-    this->pieceBoard = new uint64_t(0);
 }
 
 King::~King() {
 
 }
+
+bool King::isCheck() const {
+    if (this->inCheck)
+        return true;
+
+    return false;
+}
+
+void King::setCheck() {
+    this->inCheck = !this->inCheck;
+}
+

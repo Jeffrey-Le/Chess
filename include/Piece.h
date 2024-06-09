@@ -11,8 +11,6 @@
 
 class Piece {
     protected:
-        uint64_t *pieceBoard; // How to track piece on Board
-
         float value; // How to track piece in Classes
 
         bool isWhite = true;
@@ -21,8 +19,8 @@ class Piece {
         sf::Sprite sprite;
     public:
         Piece();
-        explicit Piece(uint64_t*, bool);
-        virtual ~Piece();
+        explicit Piece(bool);
+        virtual ~Piece() = default;
 
         void setPosition(float, float);
 
@@ -32,13 +30,9 @@ class Piece {
 
         void setTexture(std::string const &);
 
-        void setBitBoard(uint64_t*);
-
         sf::Sprite useSprite();
 
         float useVal() const;
-
-        void displayBoard() const;
 
         bool checkWhite();
 };

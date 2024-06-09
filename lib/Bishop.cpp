@@ -14,7 +14,6 @@ Bishop::Bishop() {
     }
 
     this->sprite.setTexture(this->texture);
-    this->pieceBoard = new uint64_t(0x4200000000000000);
 }
 
 Bishop::Bishop(char const color) {
@@ -29,7 +28,6 @@ Bishop::Bishop(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x4200000000000000);
         return;
     }
     if (color == 'b')
@@ -44,13 +42,11 @@ Bishop::Bishop(char const color) {
         }
 
         this->sprite.setTexture(this->texture);
-        this->pieceBoard = new uint64_t(0x42);
         return;
     }
 
     //0000000000000000000000000000000000000000000000000000000010000010
 
-    this->pieceBoard = new uint64_t(0);
 }
 
 Bishop::~Bishop() {
