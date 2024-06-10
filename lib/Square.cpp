@@ -41,11 +41,11 @@ void Square::changePiece(float const changedPiece) {
 
 bool Square::checkClickable() {
     if (this->isValidMove) {
-        this->isValidMove = false;
-
+        //this->isValidMove = false;
+        std::cout << "In Check CLicable True" << std::endl;
         return true;
     }
-
+    std::cout << "In Check CLicable FAlse" << std::endl;
     return false;
 }
 

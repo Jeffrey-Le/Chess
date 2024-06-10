@@ -27,20 +27,18 @@ void Game::openGame() {
 
     //this->board->displayBoard();
 
-    auto *test = new GameLogic(*this->board);
+    auto *logic = new GameLogic(*this->board);
 
     Square *squares = this->board->useBoard();
 
     Square *track = nullptr;
 
-    std::cout << "Track Initalized: " << track << std::endl;
-
-    CustomEvent customEvent(test);
-
-    test->displayBitboard('p', 'w');
+    CustomEvent customEvent(logic);
 
     while (this->window.isOpen())
     {
+        logic->checkMate();
+
         sf::Event event = customEvent.useCustomEvent();
         //sf::Event event; // CustomEvent
 
@@ -63,18 +61,15 @@ void Game::openGame() {
         this->window.display(); // Display
 
 
-        // CustomEvent to check when user attempts to close window
+        // Event to check when user attempts to close window
         while (this->window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 this->window.close();
 
-            //customEvent.squareClickLogic(this->window, squares, track, event);
-
             bool temp = false;
 
             for (int i = 0; i < 64; i++) {
-                // Reset Square State
                 // Click Logic
                 if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
                 {
@@ -90,14 +85,17 @@ void Game::openGame() {
                 }
             }
 
-            for (int i = 0; i < 64; i++) {
-                if (temp)
-                    squares[i].resetState();
-            }
-
             if (temp) {
+                // Reset State
+                for (int i = 0; i < 64; i++) {
+                    squares[i].resetState();
+                }
+
+                this->board->setSquares(squares); // Update Board
+
                 std::cout << "Updating Board" << std::endl;
-                test->updateBoard(this->board);
+
+                logic->updateBoard(this->board); // Update Logic
             }
 
 

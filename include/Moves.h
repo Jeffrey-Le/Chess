@@ -34,12 +34,12 @@ class Moves {
         Moves();
         ~Moves();
 
-        void getPawnMoves(int, Bitboard *&, Square *&) const;
-        void getKnightMoves(int, Bitboard *&, Square *&) const;
-        void getBishopMoves(int, Bitboard *&, Square *&) const;
-        void getRookMoves(int, Bitboard *&, Square *&) const;
-        void getQueenMoves(int, Bitboard *&, Square *&) const;
-        void getKingMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getPawnMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getKnightMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getBishopMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getRookMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getQueenMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getKingMoves(int, Bitboard *&, Square *&) const;
 
         void setWhiteP(uint64_t);
         void setBlackP(uint64_t);

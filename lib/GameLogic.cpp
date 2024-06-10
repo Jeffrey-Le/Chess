@@ -224,17 +224,29 @@ void GameLogic::getPossibleMoves(int const index) {
 
     this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
 
-    std::unordered_map<float, std::function<void()>> map = {
-        {1.0f, [moves, this, &squares, index]() {moves.getPawnMoves(index, this->possibleMoves, squares);}},
-        {3.1f, [moves, this, &squares, index]() {moves.getKnightMoves(index, this->possibleMoves, squares);}},
-        {3.2f, [moves, this, &squares, index]() {moves.getBishopMoves(index, this->possibleMoves, squares);}},
-        {5.0f, [moves, this, &squares, index]() {moves.getRookMoves(index, this->possibleMoves, squares);}}
+    std::unordered_map<float, std::function<uint64_t()>> map = {
+        {1.0f, [moves, this, &squares, index]() {return moves.getPawnMoves(index, this->possibleMoves, squares);}},
+        {3.1f, [moves, this, &squares, index]() {return moves.getKnightMoves(index, this->possibleMoves, squares);}},
+        {3.2f, [moves, this, &squares, index]() {return moves.getBishopMoves(index, this->possibleMoves, squares);}},
+        {5.0f, [moves, this, &squares, index]() {return moves.getRookMoves(index, this->possibleMoves, squares);}},
+        {9.0f, [moves, this, &squares, index]() {return moves.getQueenMoves(index, this->possibleMoves, squares);}},
+        {0.1f, [moves, this, &squares, index]() {return moves.getKingMoves(index, this->possibleMoves, squares);}}
     };
 
-    std::cout << this->possibleMoves->useBitboard() <<std::endl;
+    auto newBoard = map[std::abs(pieceVal)]();
 
-    map[std::abs(pieceVal)]();
+    this->possibleMoves->setBitboard(newBoard);
 
+    for (int i = 0; i < 64; i++) {
+        if (((~this->curBitboard->useBitboard() >> i) & 1) == 1) {
+            squares[i].setValidMove(false);
+        }
+
+        if (((this->possibleMoves->useBitboard() >> i) & 1) == 1) {
+            squares[i].changeColor(sf::Color(255, 0, 0));
+            squares[i].setValidMove(true);
+        }
+    }
 }
 
 void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
@@ -266,9 +278,23 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
 }
 
 void GameLogic::updateBoard(Board *&board) {
-    this->curBoard = board;
-    //this->curBoard->setSquares(board->useBoard());
+    //this->curBoard = board;
+    this->curBoard->setSquares(board->useBoard());
 }
+
+void GameLogic::standbyUpdate() {
+    this->turnCounter++;
+    this->playerTurn = !this->playerTurn;
+}
+
+void GameLogic::checkMate() {
+    Bitboard *whiteKing = this->bitBoards[0.1f];
+    Bitboard *blackKing = this->bitBoards[-0.1f];
+
+
+}
+
+
 
 
 // Bitwise Operations

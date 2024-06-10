@@ -12,7 +12,7 @@ Moves::~Moves() {
 
 }
 
-void Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares) const {
+uint64_t Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Pawn Moves" << std::endl;
 
     uint64_t const temp = 1ULL << index;
@@ -54,18 +54,10 @@ void Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares) co
     // board >> 8  & EMPTY & RANK8 & ~FILEH
     pawnMoves |= (BITBOARD >> 8) & this->EMPTY & this->RANK_8 & ~this->FILE_H;
 
-    for (int i = 0; i < 64; i++) {
-        if (((pawnMoves >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(255, 0, 0));
-            squares[i].setValidMove(true);
-            std::cout << "Pawn Captures" << std::endl;
-        }
-    }
-
-    board->setBitboard(pawnMoves);
+    return pawnMoves;
 }
 
-void Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squares) const {
+uint64_t Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Knight Moves" << std::endl;
 
     uint64_t const newSpaceMask = 1ULL << index;
@@ -110,17 +102,11 @@ void Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squares) 
 
     knightMoves &= ~(this->NOT_WHITE_PIECES);
 
-    for (int i = 0; i < 64; i++) {
-        if (((knightMoves >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(255, 0, 0));
-            squares[i].setValidMove(true);
-        }
-    }
+    return knightMoves;
 
-    board->setBitboard(knightMoves);
 }
 
-void Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squares) const {
+uint64_t Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Bishop Moves" << std::endl;
 
     uint64_t const newSpaceMask = 1ULL << index;
@@ -173,18 +159,10 @@ void Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squares) 
 
     std::cout << "Bishop Moves: " << bishopMoves << std::endl;
 
-
-    for (int i = 0; i < 64; i++) {
-        if (((bishopMoves >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(255, 0, 0));
-            squares[i].setValidMove(true);
-        }
-    }
-
-    board->setBitboard(bishopMoves);
+    return bishopMoves;
 }
 
-void Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares) const {
+uint64_t Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Rook Moves" << std::endl;
 
     uint64_t const newSpaceMask = 1ULL << index;
@@ -197,7 +175,52 @@ void Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares) co
 
     uint64_t rookMoves = 0ULL;
 
-    // Forwards
+    // Old
+    // for (int i = 0; i < 4; i++) {
+    //     uint64_t mask = 0ULL;
+    //     uint64_t addCond = ~0ULL;
+    //     int shift = 0;
+    //     int count = 7;
+    //
+    //     switch (i) {
+    //         case 0: {
+    //             mask = (BITBOARD >> 8);
+    //             shift = 8;
+    //             break;
+    //         }
+    //         case 1: {
+    //             mask = (BITBOARD << 8);
+    //             shift = -8;
+    //             break;
+    //         }
+    //         case 2: {
+    //             mask = (BITBOARD >> 1);
+    //             shift = 1;
+    //             addCond = ~this->FILE_H;
+    //             count = curFile+1;
+    //             break;
+    //         }
+    //         case 3: {
+    //             mask = (BITBOARD << 1);
+    //             shift = -1;
+    //             addCond = ~this->FILE_A;
+    //             count = 8-curFile;
+    //             break;
+    //         }
+    //     }
+    //
+    //     int const shiftIndex = shift;
+    //     while ((~this->NOT_WHITE_PIECES & mask) != 0ULL && (std::abs(shift) < std::abs(shiftIndex)*count)) {
+    //         rookMoves |= (mask & addCond);
+    //
+    //         shift += shiftIndex;
+    //
+    //         if (shiftIndex < 0)
+    //             mask = (BITBOARD << std::abs(shift));
+    //         else
+    //             mask = (BITBOARD >> shift);
+    //     }
+    // }
 
     for (int  i = 1; i < 7; i++) {
         if ((this->NOT_WHITE_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
@@ -217,44 +240,52 @@ void Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares) co
         if (((this->NOT_WHITE_PIECES & (BITBOARD >> i)) != 0ULL))
             break;
 
-        if (curFile != 0)
-            rookMoves |= (BITBOARD >> i) & ~this->FILE_H;
+        rookMoves |= (BITBOARD >> i) & ~this->FILE_H;
     }
 
     for (int i = 1; i < 8-curFile; i++) {
         if (((this->NOT_WHITE_PIECES & (BITBOARD << i)) != 0ULL))
             break;
 
-        if (curFile != 7)
-            rookMoves |= (BITBOARD << i) & ~this->FILE_A;
+        rookMoves |= (BITBOARD << i) & ~this->FILE_A;
     }
 
-
-    for (int i = 0; i < 64; i++) {
-        if (((rookMoves >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(255, 0, 0));
-            squares[i].setValidMove(true);
-        }
-    }
-
-    board->setBitboard(rookMoves);
+    return rookMoves;
 
 }
 
-void Moves::getQueenMoves(int index, Bitboard *&board, Square *&squares) const {
+
+uint64_t Moves::getQueenMoves(int const index, Bitboard *&board, Square *&squares) const {
+    std::cout << "In Queen Moves" << std::endl;
+
+    uint64_t const newSpaceMask = 1ULL << index;
+
+    uint64_t const BITBOARD = board->useBitboard() & (newSpaceMask);
+
+    uint64_t queenMoves = 0ULL;
+
+    queenMoves |= this->getBishopMoves(index, board, squares);
+    queenMoves |= this->getRookMoves(index, board, squares);
+
+    return queenMoves;
+}
+
+uint64_t Moves::getKingMoves(int index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Knight Moves" << std::endl;
 
     uint64_t const newSpaceMask = 1ULL << index;
 
     uint64_t const BITBOARD = board->useBitboard() & (newSpaceMask);
-}
 
-void Moves::getKingMoves(int index, Bitboard *&board, Square *&squares) const {
-    std::cout << "In Knight Moves" << std::endl;
+    // First Check if King is In Check
+    // BITBOARD & this->AllOtherPieces
+    uint64_t const knightMoves = this->getKnightMoves(index, board, squares);
+    uint64_t const queenMoves = this->getQueenMoves(index, board, squares);
+    uint64_t const pawnMoves = this->getPawnMoves(index, board, squares);
 
-    uint64_t const newSpaceMask = 1ULL << index;
+    uint64_t kingChecks = knightMoves | queenMoves | pawnMoves;
 
-    uint64_t const BITBOARD = board->useBitboard() & (newSpaceMask);
+    return kingChecks;
 }
 
 

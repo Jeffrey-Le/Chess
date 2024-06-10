@@ -29,7 +29,7 @@ class GameLogic {
         Player *players; // 1 or 2
 
         // General Logic
-        bool playerTurn = false; // true = player 1, false = player 2 or AI
+        bool playerTurn = true; // true = player 1, false = player 2 or AI
 
         bool enPeasant = true;
 
@@ -49,9 +49,12 @@ class GameLogic {
         explicit GameLogic(Board &);
         ~GameLogic();
 
+        void checkMate();
+
         void getPossibleMoves(int);
         void updateMoves(int, int);
         void updateBoard(Board *&);
+        void standbyUpdate();
 
         void displayBitboard(char, char);
         void revertBitboard();

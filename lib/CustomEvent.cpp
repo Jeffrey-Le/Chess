@@ -18,14 +18,12 @@ bool CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *click
     std::cout << "Square is CLicked" << std::endl;
 
     if (!clickedSquare->isClicked(window)) {
-
         uint64_t const diffIndex = trackedSquare - clickedSquare;
         int const temp = index + diffIndex;
 
-        std::cout << "Tracked Index: " << temp << std::endl;
-
         emptySquareClick(clickedSquare, trackedSquare);
-        this->logic->updateMoves(index, temp);
+        if (clickedSquare->checkClickable())
+            this->logic->updateMoves(index, temp);
 
         return true;
     }
@@ -53,6 +51,8 @@ void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSqua
     std::cout << "Empty" << std::endl;
 
     if (clickedSquare->checkClickable()) {
+        std::cout << "CHeckCLicable is True" << std::endl;
+        clickedSquare->setValidMove(true);
         clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
 
         trackedSquare->setOccupiedPiece(new Piece());
