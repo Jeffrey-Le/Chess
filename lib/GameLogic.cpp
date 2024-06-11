@@ -230,7 +230,7 @@ void GameLogic::getPossibleMoves(int const index) {
         {3.2f, [moves, this, &squares, index]() {return moves.getBishopMoves(index, this->possibleMoves, squares);}},
         {5.0f, [moves, this, &squares, index]() {return moves.getRookMoves(index, this->possibleMoves, squares);}},
         {9.0f, [moves, this, &squares, index]() {return moves.getQueenMoves(index, this->possibleMoves, squares);}},
-        {0.1f, [moves, this, &squares, index]() {return moves.getKingMoves(index, this->possibleMoves, squares);}}
+        {0.1f, [moves, this, &squares, index]() {return moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);}}
     };
 
     auto newBoard = map[std::abs(pieceVal)]();

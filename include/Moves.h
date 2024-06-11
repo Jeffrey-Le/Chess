@@ -31,7 +31,7 @@ class Moves {
         uint64_t BLACK_PIECES = 0ULL;
         uint64_t EMPTY = 0ULL;
     public:
-        Moves();
+        Moves() = default;
         ~Moves();
 
         uint64_t getPawnMoves(int, Bitboard *&, Square *&) const;
@@ -39,7 +39,9 @@ class Moves {
         uint64_t getBishopMoves(int, Bitboard *&, Square *&) const;
         uint64_t getRookMoves(int, Bitboard *&, Square *&) const;
         uint64_t getQueenMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getKingMoves(int, Bitboard *&, Square *&) const;
+        uint64_t getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&) const;
+
+        static bool checkKingInCheck(uint64_t const [], uint64_t);
 
         void setWhiteP(uint64_t);
         void setBlackP(uint64_t);
