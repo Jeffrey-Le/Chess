@@ -44,6 +44,10 @@ class GameLogic {
         Bitboard *possibleMoves;
 
         void setIntialBoard();
+
+        float operator<=(float &);
+
+        static bool compareNeg(float, float);
     public:
         GameLogic();
         explicit GameLogic(Board &);

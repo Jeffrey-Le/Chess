@@ -20,10 +20,10 @@ uint64_t Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares
     uint64_t const BITBOARD = board->useBitboard() & (temp);
 
     // Check Capture Right
-    uint64_t pawnMoves = (BITBOARD >> 7) & this->BLACK_PIECES & ~this->RANK_8 & ~this->FILE_A;
+    uint64_t pawnMoves = (BITBOARD >> 7) & this->OPPOSING_PIECES & ~this->RANK_8 & ~this->FILE_A;
 
     // Check Capture Left
-    pawnMoves |= (BITBOARD >> 9) & this->BLACK_PIECES & ~this->RANK_8 & ~this->FILE_H;
+    pawnMoves |= (BITBOARD >> 9) & this->OPPOSING_PIECES & ~this->RANK_8 & ~this->FILE_H;
 
     // Move 1 Square
     // board >> 8  && EMPTY && ~RANK8
@@ -41,10 +41,10 @@ uint64_t Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares
     // -- Promotions --
 
     // Promotion while Capture Right
-    pawnMoves |= (BITBOARD >> 7) & this->BLACK_PIECES & this->RANK_8 & ~this->FILE_A;
+    pawnMoves |= (BITBOARD >> 7) & this->OPPOSING_PIECES & this->RANK_8 & ~this->FILE_A;
 
     // Promotion while Capture Left
-    pawnMoves |= (BITBOARD >> 9) & this->BLACK_PIECES & this->RANK_8 & ~this->FILE_H;
+    pawnMoves |= (BITBOARD >> 9) & this->OPPOSING_PIECES & this->RANK_8 & ~this->FILE_H;
 
     // Promotion Move 1 Square
     pawnMoves |= (BITBOARD >> 8) & this->EMPTY & this->RANK_8 & ~this->FILE_H;
@@ -95,7 +95,7 @@ uint64_t Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squar
     }
 
 
-    knightMoves &= ~(this->NOT_WHITE_PIECES);
+    knightMoves &= ~(this->NOT_PLAYER_PIECES);
 
     return knightMoves;
 
@@ -115,7 +115,7 @@ uint64_t Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squar
 
     // Check each other Ranks (7 Ranks) Up Moves
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD >> (7 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD >> (7 * i))) != 0ULL)
             break;
 
         if ((curFile + i) < 8 )
@@ -124,7 +124,7 @@ uint64_t Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squar
     }
 
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD >> (9 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD >> (9 * i))) != 0ULL)
             break;
 
         if ((curFile - i) >= 0)
@@ -135,7 +135,7 @@ uint64_t Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squar
 
     // Down Moves
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD << (9 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD << (9 * i))) != 0ULL)
             break;
 
         if ((curFile + i) < 8)
@@ -143,14 +143,14 @@ uint64_t Moves::getBishopMoves(int const index, Bitboard *&board, Square *&squar
     }
 
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD << (7 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD << (7 * i))) != 0ULL)
             break;
 
         if ((curFile - i) >= 0)
             bishopMoves |= (BITBOARD << (7 * i)) & ~this->FILE_H;
     }
 
-    bishopMoves |= bishopMoves & ~this->RANK_8 & ~(this->NOT_WHITE_PIECES);
+    bishopMoves |= bishopMoves & ~this->RANK_8 & ~(this->NOT_PLAYER_PIECES);
 
     std::cout << "Bishop Moves: " << bishopMoves << std::endl;
 
@@ -205,7 +205,7 @@ uint64_t Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares
     //     }
     //
     //     int const shiftIndex = shift;
-    //     while ((~this->NOT_WHITE_PIECES & mask) != 0ULL && (std::abs(shift) < std::abs(shiftIndex)*count)) {
+    //     while ((~this->NOT_PLAYER_PIECES & mask) != 0ULL && (std::abs(shift) < std::abs(shiftIndex)*count)) {
     //         rookMoves |= (mask & addCond);
     //
     //         shift += shiftIndex;
@@ -218,28 +218,28 @@ uint64_t Moves::getRookMoves(int const index, Bitboard *&board, Square *&squares
     // }
 
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
             break;
 
         rookMoves |= (BITBOARD >> (8 * i));
     }
 
     for (int  i = 1; i < 7; i++) {
-        if ((this->NOT_WHITE_PIECES & (BITBOARD << (8 * i))) != 0ULL)
+        if ((this->NOT_PLAYER_PIECES & (BITBOARD << (8 * i))) != 0ULL)
             break;
 
         rookMoves |= (BITBOARD << (8 * i));
     }
 
     for (int i = 1; i < curFile+1; i++) {
-        if (((this->NOT_WHITE_PIECES & (BITBOARD >> i)) != 0ULL))
+        if (((this->NOT_PLAYER_PIECES & (BITBOARD >> i)) != 0ULL))
             break;
 
         rookMoves |= (BITBOARD >> i) & ~this->FILE_H;
     }
 
     for (int i = 1; i < 8-curFile; i++) {
-        if (((this->NOT_WHITE_PIECES & (BITBOARD << i)) != 0ULL))
+        if (((this->NOT_PLAYER_PIECES & (BITBOARD << i)) != 0ULL))
             break;
 
         rookMoves |= (BITBOARD << i) & ~this->FILE_A;
@@ -299,42 +299,42 @@ uint64_t Moves::getKingMoves(int index, std::unordered_map<float, Bitboard*> bit
     uint64_t mask = 0ULL;
 
     // North East NE (Top-Left)
-    mask |= (BITBOARD >> 9) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_1;
+    mask |= (BITBOARD >> 9) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_1;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // North West NW (Top-Right)
-    kingMoves |= (BITBOARD >> 7) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_1;
+    kingMoves |= (BITBOARD >> 7) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_1;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // North N (Top-Mid)
-    kingMoves |= (BITBOARD >> 8) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_1;
+    kingMoves |= (BITBOARD >> 8) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_1;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // South East SE (Bottom-Left)
-    kingMoves |= (BITBOARD << 7) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_8;
+    kingMoves |= (BITBOARD << 7) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_8;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // South West SW (Bottom-Right)
-    kingMoves |= (BITBOARD << 9) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_8;
+    kingMoves |= (BITBOARD << 9) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_8;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // South S (Bottom-Mid)
-    kingMoves |= (BITBOARD << 8) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->RANK_8;
+    kingMoves |= (BITBOARD << 8) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_8;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // West W (Mid-Left)
-    kingMoves |= (BITBOARD >> 1) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->FILE_H;
+    kingMoves |= (BITBOARD >> 1) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_H;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
     // East E (Mid-Right)
-    kingMoves |= (BITBOARD << 1) & ~this->NOT_WHITE_PIECES & (this->BLACK_PIECES | this->EMPTY) & ~this->FILE_A;
+    kingMoves |= (BITBOARD << 1) & ~this->NOT_PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_A;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves |= mask;
 
@@ -358,11 +358,11 @@ bool Moves::checkKingInCheck(uint64_t const otherPieces[], uint64_t mask) {
 
 
 void Moves::setWhiteP(uint64_t const board) {
-    this->NOT_WHITE_PIECES = board;
+    this->NOT_PLAYER_PIECES = board;
 }
 
 void Moves::setBlackP(uint64_t const board) {
-    this->BLACK_PIECES = board;
+    this->OPPOSING_PIECES = board;
 }
 
 void Moves::setEmpty(uint64_t const board) {

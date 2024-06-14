@@ -185,6 +185,20 @@ void GameLogic::revertBitboard(){
 //    this->curBoard->displayBoard();
 }
 
+bool GameLogic::compareNeg(float x, float y) {
+    if (y > 0.0f) {
+        return (x > y);
+    }
+    return (x <= y);
+}
+
+float GameLogic::operator<=(float &other) {
+    if (other > 0.0f)
+        return (other < 0);
+
+    return (other > 0);
+}
+
 void GameLogic::getPossibleMoves(int const index) {
     Moves moves;
 
@@ -194,33 +208,106 @@ void GameLogic::getPossibleMoves(int const index) {
 
     float const pieceVal = squares[index].usePiece();
 
+    int multiplier = 1; // w = 1, b = -1
+
+    uint64_t notPlayerP = this->bitBoards[pieceVal]->useBitboard();
+
     if (std::tolower(this->players[0].getColor().at(0)) == 'w') {
-        uint64_t notWP = this->bitBoards[pieceVal]->useBitboard();
-
-        for (auto & bitBoard : this->bitBoards) {
+        for (auto &bitBoard: this->bitBoards) {
             if (bitBoard.first > 0.0f)
-                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
+                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
         }
-
-        notWP = bitwiseOr(notWP, this->bitBoards[-0.1f]->useBitboard());
-
-        moves.setWhiteP(notWP);
-
-        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
-
-        for (auto & bitBoard : this->bitBoards) {
-            if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
-                continue;
-
-            if (bitBoard.first < 0.0f)
-                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
-        }
-
-        moves.setBlackP(BlP);
-
-        uint64_t const empty = ~bitwiseOr(notWP, BlP);
-        moves.setEmpty(empty);
     }
+    else {
+        for (auto &bitBoard: this->bitBoards) {
+            if (bitBoard.first < 0.0f)
+                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+        }
+
+        multiplier = -1;
+    }
+
+
+    notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f * float(multiplier)]->useBitboard());
+
+    moves.setWhiteP(notPlayerP);
+
+    uint64_t opposingP = this->bitBoards[-1.0f * float(multiplier)]->useBitboard();
+
+    for (auto & bitBoard : this->bitBoards) {
+        if (bitBoard.first == (-1.0f * float(multiplier)) || bitBoard.first == (-0.1f * float(multiplier)))
+            continue;
+
+        if (multiplier > 0) {
+            if (bitBoard.first < 0.0f)
+                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+        }
+        else {
+            if (bitBoard.first > 0.0f)
+                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+        }
+    }
+
+    std::cout << notPlayerP << std::endl;
+
+    moves.setBlackP(opposingP);
+
+    uint64_t const empty = ~bitwiseOr(notPlayerP, opposingP);
+    moves.setEmpty(empty);
+//
+//    if (std::tolower(this->players[0].getColor().at(0)) == 'w') {
+//
+//        for (auto & bitBoard : this->bitBoards) {
+//            if (bitBoard.first > 0.0f)
+//                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+//        }
+//
+//        notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f]->useBitboard());
+//
+//        moves.setWhiteP(notPlayerP);
+//
+//        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
+//
+//        for (auto & bitBoard : this->bitBoards) {
+//            if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
+//                continue;
+//
+//            if (bitBoard.first < 0.0f)
+//                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+//        }
+//
+//        moves.setBlackP(BlP);
+//
+//        uint64_t const empty = ~bitwiseOr(notPlayerP, BlP);
+//        moves.setEmpty(empty);
+//    }
+//    else {
+//        uint64_t notWP = this->bitBoards[pieceVal]->useBitboard();
+//
+//        for (auto & bitBoard : this->bitBoards) {
+//            if (bitBoard.first > 0.0f)
+//                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
+//        }
+//
+//        notWP = bitwiseOr(notWP, this->bitBoards[-0.1f]->useBitboard());
+//
+//        moves.setWhiteP(notWP);
+//
+//        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
+//
+//        for (auto & bitBoard : this->bitBoards) {
+//            if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
+//                continue;
+//
+//            if (bitBoard.first < 0.0f)
+//                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
+//        }
+//
+//        moves.setBlackP(BlP);
+//
+//        uint64_t const empty = ~bitwiseOr(notWP, BlP);
+//        moves.setEmpty(empty);
+//    }
 
     this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
 

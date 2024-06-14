@@ -27,11 +27,11 @@ class Moves {
         uint64_t QUEEN_SIDE = 1085102592571150095ULL; // 0x0f0f0f0f0f0f0f0f
         uint64_t KING_B7 = 512ull;//18014398509481984ULL; // 0x0040000000000000
         uint64_t KNIGHT_C6 = 262144ull;//35184372088832ULL; // 0x0000200000000000
-        uint64_t NOT_WHITE_PIECES = 0ULL;
-        uint64_t BLACK_PIECES = 0ULL;
+        uint64_t NOT_PLAYER_PIECES = 0ULL;
+        uint64_t OPPOSING_PIECES = 0ULL;
         uint64_t EMPTY = 0ULL;
     public:
-        Moves() = default;
+        Moves();
         ~Moves();
 
         uint64_t getPawnMoves(int, Bitboard *&, Square *&) const;
