@@ -12,12 +12,14 @@
 #include "Board.h"
 #include "Bitboard.h"
 #include "GameLogic.h"
+#include "GameInterface.h"
 
 class Game {
     private:
         sf::RenderWindow window;
         Board *board;
         sf::Mouse *myMouse;
+        GameInterface *interface;
     public:
         Game();
         ~Game();

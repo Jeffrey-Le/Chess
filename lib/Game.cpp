@@ -11,10 +11,14 @@ Game::Game() {
     this->board = new Board(); // Create a new board
 
     this->myMouse = new sf::Mouse();
+
+    this->interface = new GameInterface();
 }
 
 Game::~Game() {
     delete this->board;
+    delete this->interface;
+    delete this->myMouse;
 }
 
 void Game::openGame() {
@@ -34,6 +38,13 @@ void Game::openGame() {
     Square *track = nullptr;
 
     CustomEvent customEvent(logic);
+
+    for (int i = 0; i < 64; i++) {
+        if (squares[i].usePiece() > 0.0f)
+            squares[i].setValidMove(true);
+        else
+            squares[i].setValidMove(false);
+    }
 
     while (this->window.isOpen())
     {
@@ -57,6 +68,9 @@ void Game::openGame() {
             this->window.draw(this->board->usePositions('n')[i]);
             this->window.draw(this->board->usePositions('l')[i]);
         }
+
+        this->window.draw(this->interface->useTurnUI());
+        this->window.draw(this->interface->useColorUI());
 
         this->window.display(); // Display
 
@@ -95,7 +109,14 @@ void Game::openGame() {
 
                 std::cout << "Updating Board" << std::endl;
 
+                logic->standbyUpdate();
+
                 logic->updateBoard(this->board); // Update Logic
+
+                //logic->setPlayerTurn();
+
+                this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
+                this->interface->inverseWhite();
             }
 
 

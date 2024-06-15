@@ -7,6 +7,7 @@
 #define MOVES_H
 
 #include <cstdint>
+#include <unordered_map>
 
 #include "Bitboard.h"
 #include "Pawn.h"

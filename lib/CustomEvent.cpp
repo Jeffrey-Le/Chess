@@ -17,19 +17,29 @@ CustomEvent::CustomEvent(GameLogic *&existingLogic) {
 bool CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *clickedSquare, Square *&trackedSquare, int const index) const{
     std::cout << "Square is CLicked" << std::endl;
 
-    if (!clickedSquare->isClicked(window)) {
+    if (!clickedSquare->isClicked(window)  && trackedSquare != nullptr) {
         uint64_t const diffIndex = trackedSquare - clickedSquare;
         int const temp = index + diffIndex;
 
-        emptySquareClick(clickedSquare, trackedSquare);
-        if (clickedSquare->checkClickable())
+        if (clickedSquare->checkClickable()) {
+            emptySquareClick(clickedSquare, trackedSquare);
             this->logic->updateMoves(index, temp);
+        }
 
         return true;
     }
     else {
-        occupiedSquareClick(clickedSquare, trackedSquare);
-        this->logic->getPossibleMoves(index);
+        if (clickedSquare->checkClickable()) {
+            if (trackedSquare != clickedSquare && trackedSquare != nullptr) {
+                trackedSquare->resetState();
+                this->logic->resetPossibleMoves();
+            }
+
+            occupiedSquareClick(clickedSquare, trackedSquare);
+            this->logic->getPossibleMoves(index);
+        }
+        else
+            std::cout << "Not Correct Color" << std::endl;
     }
 
     return false;
@@ -37,6 +47,7 @@ bool CustomEvent::squareClickLogic(sf::RenderWindow const &window, Square *click
 }
 
 void CustomEvent::occupiedSquareClick(Square *&clickedSquare, Square *& trackedSquare) {
+
     std::cout << "Not Empty" << std::endl;
 
     clickedSquare->changeColor(sf::Color(0, 0, 175, 150));
@@ -45,18 +56,17 @@ void CustomEvent::occupiedSquareClick(Square *&clickedSquare, Square *& trackedS
 
     std::cout << "Trackec: " << trackedSquare << std::endl;
 
+
+
 }
 
 void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSquare) {
     std::cout << "Empty" << std::endl;
 
-    if (clickedSquare->checkClickable()) {
-        std::cout << "CHeckCLicable is True" << std::endl;
-        clickedSquare->setValidMove(true);
-        clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
+    clickedSquare->setValidMove(true);
+    clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
 
-        trackedSquare->setOccupiedPiece(new Piece());
-    }
+    trackedSquare->setOccupiedPiece(new Piece());
 }
 
 

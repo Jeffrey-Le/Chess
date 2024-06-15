@@ -56,12 +56,15 @@ class GameLogic {
         void checkMate();
 
         void getPossibleMoves(int);
+
         void updateMoves(int, int);
         void updateBoard(Board *&);
         void standbyUpdate();
 
         void displayBitboard(char, char);
         void revertBitboard();
+
+        void resetPossibleMoves();
 
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);
         static uint64_t bitwiseOr(Bitboard *&, Bitboard *&);

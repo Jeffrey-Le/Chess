@@ -15,19 +15,42 @@ Moves::~Moves() {
 uint64_t Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares) const {
     std::cout << "In Pawn Moves" << std::endl;
 
-    uint64_t const temp = 1ULL << index;
+    uint64_t const piecePos = 1ULL << index;
 
-    uint64_t const BITBOARD = board->useBitboard() & (temp);
+    uint64_t const BITBOARD = board->useBitboard() & (piecePos);
+
+    bool isNeg = (squares[index].usePiece() < 0.0f);
+
+    uint64_t mask = 0ULL;
 
     // Check Capture Right
-    uint64_t pawnMoves = (BITBOARD >> 7) & this->OPPOSING_PIECES & ~this->RANK_8 & ~this->FILE_A;
+    uint64_t pawnMoves = this->OPPOSING_PIECES & ~this->FILE_A;
+
+    if (isNeg)
+        pawnMoves &= (BITBOARD << 7) & ~this->RANK_1;
+    else
+        pawnMoves &= (BITBOARD >> 7) & ~this->RANK_8;
 
     // Check Capture Left
-    pawnMoves |= (BITBOARD >> 9) & this->OPPOSING_PIECES & ~this->RANK_8 & ~this->FILE_H;
+    mask = this->OPPOSING_PIECES & ~this->FILE_H;
+
+    if (isNeg)
+        mask &= (BITBOARD << 9) & ~this->RANK_1;
+    else
+        mask &= (BITBOARD >> 9) & ~this->RANK_8;
+
+    pawnMoves |= mask;
 
     // Move 1 Square
     // board >> 8  && EMPTY && ~RANK8
-    pawnMoves |= (BITBOARD >> 8) & this->EMPTY & ~this->RANK_8;
+    mask = this->EMPTY;
+
+    if (isNeg)
+        mask &= (BITBOARD << 8) & ~this->RANK_1;
+    else
+        mask &= (BITBOARD >> 8) & ~this->RANK_8;
+
+    pawnMoves |= mask;
 
     // Guaranteed to be a Pawn Derived Class
     Pawn* pawn = dynamic_cast<Pawn*>(squares[index].useOccupiedPiece());
@@ -36,18 +59,50 @@ uint64_t Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares
     if (pawn->checkFirstMove()) {
         pawn->setFirstMove();
 
-        pawnMoves |= (BITBOARD >> 16) & this->EMPTY & ~this->RANK_8 & ~this->FILE_H;
+        mask = this->EMPTY & ~this->FILE_H;
+
+        if (isNeg)
+            mask &= (BITBOARD << 16) & ~this->RANK_1;
+        else
+            mask &= (BITBOARD >> 16) & ~this->RANK_8;
     }
+    else
+        mask = 0ULL;
+
+    pawnMoves |= mask;
+
+
     // -- Promotions --
 
     // Promotion while Capture Right
-    pawnMoves |= (BITBOARD >> 7) & this->OPPOSING_PIECES & this->RANK_8 & ~this->FILE_A;
+    mask = this->OPPOSING_PIECES & ~this->FILE_A;
+
+    if (isNeg)
+        mask &= (BITBOARD << 7) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 7) & this->RANK_8;
+
+    pawnMoves |= mask;
 
     // Promotion while Capture Left
-    pawnMoves |= (BITBOARD >> 9) & this->OPPOSING_PIECES & this->RANK_8 & ~this->FILE_H;
+    mask |=  this->OPPOSING_PIECES & ~this->FILE_H;
+
+    if (isNeg)
+        mask &= (BITBOARD << 9) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 9) & this->RANK_8;
+
+    pawnMoves |= mask;
 
     // Promotion Move 1 Square
-    pawnMoves |= (BITBOARD >> 8) & this->EMPTY & this->RANK_8 & ~this->FILE_H;
+    mask |= this->EMPTY & ~this->FILE_H;
+
+    if (isNeg)
+        mask &= (BITBOARD << 8) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 8) & this->RANK_8;
+
+    pawnMoves |= mask;
 
     return pawnMoves;
 }
@@ -59,7 +114,7 @@ uint64_t Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squar
 
     uint64_t const BITBOARD = board->useBitboard() & (newSpaceMask);
 
-    int curFile = index % 8;
+    //int curFile = index % 8;
 
     uint64_t knightMoves = 0ULL;
 
@@ -93,7 +148,6 @@ uint64_t Moves::getKnightMoves(int const index, Bitboard *&board, Square *&squar
         // Check Moves Left Down
         knightMoves |= ((BITBOARD << 15) | (BITBOARD << 6)) & ~this->FILE_H & ~this->RANK_8;
     }
-
 
     knightMoves &= ~(this->NOT_PLAYER_PIECES);
 

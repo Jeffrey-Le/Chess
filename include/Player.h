@@ -17,6 +17,7 @@ class Player {
         ~Player();
 
         std::string getColor() const;
+        void setColor(std::string);
 };
 
 #endif //CHESS_PLAYER_H

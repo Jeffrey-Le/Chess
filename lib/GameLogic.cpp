@@ -9,6 +9,8 @@
 GameLogic::GameLogic() {
     this->players = new Player[2];
 
+    players[1].setColor("Black");
+
     this->curBoard = nullptr;
     this->curBitboard = new Bitboard();
     this->possibleMoves = new Bitboard();
@@ -24,6 +26,8 @@ GameLogic::GameLogic() {
 
 GameLogic::GameLogic(Board &board) {
     this->players = new Player[2];
+
+    players[1].setColor("Black");
 
     this->curBoard = &board;
     this->curBitboard = new Bitboard();
@@ -208,25 +212,14 @@ void GameLogic::getPossibleMoves(int const index) {
 
     float const pieceVal = squares[index].usePiece();
 
-    int multiplier = 1; // w = 1, b = -1
+    int multiplier =  (playerTurn) ? 1 : -1; // w = 1, b = -1
 
     uint64_t notPlayerP = this->bitBoards[pieceVal]->useBitboard();
 
-    if (std::tolower(this->players[0].getColor().at(0)) == 'w') {
-        for (auto &bitBoard: this->bitBoards) {
-            if (bitBoard.first > 0.0f)
-                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-        }
+    for (auto &bitBoard: this->bitBoards) {
+        if ((multiplier > 0 && bitBoard.first > 0.0f) || (multiplier < 0 && bitBoard.first < 0.0f))
+            notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
     }
-    else {
-        for (auto &bitBoard: this->bitBoards) {
-            if (bitBoard.first < 0.0f)
-                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-        }
-
-        multiplier = -1;
-    }
-
 
     notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f * float(multiplier)]->useBitboard());
 
@@ -234,18 +227,12 @@ void GameLogic::getPossibleMoves(int const index) {
 
     uint64_t opposingP = this->bitBoards[-1.0f * float(multiplier)]->useBitboard();
 
-    for (auto & bitBoard : this->bitBoards) {
+    for (auto &bitBoard : this->bitBoards) {
         if (bitBoard.first == (-1.0f * float(multiplier)) || bitBoard.first == (-0.1f * float(multiplier)))
             continue;
 
-        if (multiplier > 0) {
-            if (bitBoard.first < 0.0f)
-                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-        }
-        else {
-            if (bitBoard.first > 0.0f)
-                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-        }
+        if ((multiplier > 0 && bitBoard.first < 0.0f) || (multiplier < 0 && bitBoard.first > 0.0f))
+            notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
     }
 
     std::cout << notPlayerP << std::endl;
@@ -367,7 +354,28 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
 void GameLogic::updateBoard(Board *&board) {
     //this->curBoard = board;
     this->curBoard->setSquares(board->useBoard());
+
+    Square *squares = this->curBoard->useBoard();
+
+    for (int i = 0; i < 64; i++) {
+        if ((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f))
+            squares[i].setValidMove(true);
+        else
+            squares[i].setValidMove(false);
+
+    }
 }
+
+void GameLogic::resetPossibleMoves() {
+    Square *squares = this->curBoard->useBoard();
+
+    for (int i = 0; i < 64; i++) {
+        if (((this->possibleMoves->useBitboard() >> i) & 1) == 1) {
+            squares[i].resetState();
+        }
+    }
+}
+
 
 void GameLogic::standbyUpdate() {
     this->turnCounter++;
@@ -380,6 +388,7 @@ void GameLogic::checkMate() {
 
 
 }
+
 
 
 

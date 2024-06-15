@@ -16,3 +16,13 @@ Player::~Player() {
 std::string Player::getColor() const{
     return this->colorString;
 }
+
+void Player::setColor(std::string colorString) {
+    std::transform(colorString.begin(), colorString.end(), colorString.begin(), [](unsigned char c) {return std::tolower(c);});
+
+    if (colorString == "black")
+        this->colorString = "Black";
+
+    if (colorString == "white")
+        this->colorString = "White";
+}
