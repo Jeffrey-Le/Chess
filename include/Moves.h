@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <vector>
 
 #include "Bitboard.h"
 #include "Pawn.h"
@@ -35,15 +36,18 @@ class Moves {
         Moves();
         ~Moves();
 
-        uint64_t getPawnMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getPawnMoves(int, Bitboard *&, Square *&) const;
         uint64_t getKnightMoves(int, Bitboard *&, Square *&) const;
         uint64_t getBishopMoves(int, Bitboard *&, Square *&) const;
         uint64_t getRookMoves(int, Bitboard *&, Square *&) const;
         uint64_t getQueenMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&) const;
+        uint64_t getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&);
 
+        // Helper Functions
+        void blackOrWhite(bool , uint64_t, uint64_t &, int) const;
         static bool checkKingInCheck(uint64_t const [], uint64_t);
 
+        // Setter Functions
         void setWhiteP(uint64_t);
         void setBlackP(uint64_t);
         void setEmpty(uint64_t);

@@ -225,91 +225,46 @@ void GameLogic::getPossibleMoves(int const index) {
 
     moves.setWhiteP(notPlayerP);
 
+
+    std::cout << "PlayerP: " << notPlayerP << std::endl;
+
     uint64_t opposingP = this->bitBoards[-1.0f * float(multiplier)]->useBitboard();
 
     for (auto &bitBoard : this->bitBoards) {
         if (bitBoard.first == (-1.0f * float(multiplier)) || bitBoard.first == (-0.1f * float(multiplier)))
             continue;
 
-        if ((multiplier > 0 && bitBoard.first < 0.0f) || (multiplier < 0 && bitBoard.first > 0.0f))
-            notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+        if ((multiplier > 0 && bitBoard.first < 0.0f) || (multiplier < 0 && bitBoard.first > 0.0f)) {
+            opposingP = bitwiseOr(opposingP, bitBoard.second->useBitboard());
+        }
     }
 
-    std::cout << notPlayerP << std::endl;
+    std::cout << "Opposing: " << opposingP << std::endl;
 
     moves.setBlackP(opposingP);
 
     uint64_t const empty = ~bitwiseOr(notPlayerP, opposingP);
     moves.setEmpty(empty);
-//
-//    if (std::tolower(this->players[0].getColor().at(0)) == 'w') {
-//
-//        for (auto & bitBoard : this->bitBoards) {
-//            if (bitBoard.first > 0.0f)
-//                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-//        }
-//
-//        notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f]->useBitboard());
-//
-//        moves.setWhiteP(notPlayerP);
-//
-//        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
-//
-//        for (auto & bitBoard : this->bitBoards) {
-//            if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
-//                continue;
-//
-//            if (bitBoard.first < 0.0f)
-//                notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-//        }
-//
-//        moves.setBlackP(BlP);
-//
-//        uint64_t const empty = ~bitwiseOr(notPlayerP, BlP);
-//        moves.setEmpty(empty);
-//    }
-//    else {
-//        uint64_t notWP = this->bitBoards[pieceVal]->useBitboard();
-//
-//        for (auto & bitBoard : this->bitBoards) {
-//            if (bitBoard.first > 0.0f)
-//                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
-//        }
-//
-//        notWP = bitwiseOr(notWP, this->bitBoards[-0.1f]->useBitboard());
-//
-//        moves.setWhiteP(notWP);
-//
-//        uint64_t BlP = this->bitBoards[-1.0f]->useBitboard();
-//
-//        for (auto & bitBoard : this->bitBoards) {
-//            if (bitBoard.first == -1.0f || bitBoard.first == -0.1f)
-//                continue;
-//
-//            if (bitBoard.first < 0.0f)
-//                notWP = bitwiseOr(notWP, bitBoard.second->useBitboard());
-//        }
-//
-//        moves.setBlackP(BlP);
-//
-//        uint64_t const empty = ~bitwiseOr(notWP, BlP);
-//        moves.setEmpty(empty);
-//    }
 
     this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
 
     std::unordered_map<float, std::function<uint64_t()>> map = {
-        {1.0f, [moves, this, &squares, index]() {return moves.getPawnMoves(index, this->possibleMoves, squares);}},
-        {3.1f, [moves, this, &squares, index]() {return moves.getKnightMoves(index, this->possibleMoves, squares);}},
-        {3.2f, [moves, this, &squares, index]() {return moves.getBishopMoves(index, this->possibleMoves, squares);}},
-        {5.0f, [moves, this, &squares, index]() {return moves.getRookMoves(index, this->possibleMoves, squares);}},
-        {9.0f, [moves, this, &squares, index]() {return moves.getQueenMoves(index, this->possibleMoves, squares);}},
-        {0.1f, [moves, this, &squares, index]() {return moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);}}
+        {1.0f, [&moves, this, &squares, index, opposingP]() {
+            std::vector<uint64_t> pawnMoves = moves.getPawnMoves(index, this->possibleMoves, squares);
+            return bitwiseOr(pawnMoves[0], (pawnMoves[1] & opposingP));
+        }},
+        {3.1f, [&moves, this, &squares, index]() {return moves.getKnightMoves(index, this->possibleMoves, squares);}},
+        {3.2f, [&moves, this, &squares, index]() {return moves.getBishopMoves(index, this->possibleMoves, squares);}},
+        {5.0f, [&moves, this, &squares, index]() {return moves.getRookMoves(index, this->possibleMoves, squares);}},
+        {9.0f, [&moves, this, &squares, index]() {return moves.getQueenMoves(index, this->possibleMoves, squares);}},
+        {0.1f, [&moves, this, &squares, index]() {return moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);}}
     };
 
     auto newBoard = map[std::abs(pieceVal)]();
 
     this->possibleMoves->setBitboard(newBoard);
+
+    std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
 
     for (int i = 0; i < 64; i++) {
         if (((~this->curBitboard->useBitboard() >> i) & 1) == 1) {

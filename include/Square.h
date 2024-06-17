@@ -27,8 +27,6 @@ class Square {
 
         void echoPiece() const;
         void changePiece(float);
-        void checkPiece() const;
-        bool checkClickable();
 
         void resetState();
 
@@ -44,7 +42,8 @@ class Square {
         float usePiece() const;
         Piece *useOccupiedPiece() const;
 
-        bool isClicked(sf::RenderWindow const &);
+        bool checkValid() const;
+        bool checkEmpty() const;
 };
 
 #endif //CHESS_SQUARE_H

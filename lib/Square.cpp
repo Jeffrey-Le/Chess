@@ -39,16 +39,6 @@ void Square::changePiece(float const changedPiece) {
     this->isEmpty = false;
 }
 
-bool Square::checkClickable() {
-    if (this->isValidMove) {
-        //this->isValidMove = false;
-        std::cout << "In Check CLicable True" << std::endl;
-        return true;
-    }
-    std::cout << "In Check CLicable FAlse" << std::endl;
-    return false;
-}
-
 
 
 void Square::changeColor(sf::Color const color) const {
@@ -80,8 +70,15 @@ float Square::usePiece() const {
     return this->piece;
 }
 
-bool Square::isClicked(sf::RenderWindow const &window) {
-    if (!this->isEmpty)
+bool Square::checkValid() const {
+    if (this->isValidMove)
+        return true;
+
+    return false;
+}
+
+bool Square::checkEmpty() const {
+    if (this->isEmpty)
         return true;
 
     return false;
@@ -109,10 +106,11 @@ void Square::resetState() {
 
     //std::cout << "Resetting State" << std::endl;
 
-    this->setColor(this->color);
+    this->changeColor(this->color);
 
     if (this->occupiedPiece == nullptr || this->piece == 0.0f) {
         this->isEmpty = true;
+        this->isValidMove = false;
     }
 }
 
