@@ -20,7 +20,7 @@ class CustomEvent {
         CustomEvent();
         explicit CustomEvent(GameLogic *&);
 
-        bool squareClickLogic(sf::RenderWindow const &, Square *, Square *&, int index) const;
+        bool squareClickLogic(std::unordered_map<char, King*>, Square *, Square *&, int index) const;
         static void occupiedSquareClick(Square *&, Square *&);
         static void emptySquareClick(Square *&, Square *&) ;
 

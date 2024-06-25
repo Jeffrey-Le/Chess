@@ -5,13 +5,13 @@
 
 Bitboard::Bitboard() {
     this->board = 0ULL;
-    std::cout << "In Bitboard: " << this->board << std::endl;
+    //std::cout << "In Bitboard: " << this->board << std::endl;
 }
 
 Bitboard::Bitboard(Square *squares) {
     this->board = 0ULL;
 
-    std::cout << "In Bitboard: " << this->board << std::endl;
+    //std::cout << "In Bitboard: " << this->board << std::endl;
 
 }
 

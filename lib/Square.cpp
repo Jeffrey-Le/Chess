@@ -7,7 +7,7 @@
 #include "../include/Square.h"
 
 Square::Square() {
-    std::cout << "Initializing Square \n";
+    //std::cout << "Initializing Square \n";
 
     this->squareSpace = new sf::RectangleShape(sf::Vector2f(50.f, 50.f));
     this->squareSpace->setPosition(0.f, 0.f);
@@ -16,7 +16,7 @@ Square::Square() {
 }
 
 Square::Square(float const pieceVal) {
-    std::cout << "Initializing Square \n";
+    //std::cout << "Initializing Square \n";
 
     this->squareSpace = new sf::RectangleShape(sf::Vector2f(50.f, 50.f));
     this->squareSpace->setPosition(0.f, 0.f);
@@ -112,6 +112,8 @@ void Square::resetState() {
         this->isEmpty = true;
         this->isValidMove = false;
     }
+
+    //this->isValidMove = false;
 }
 
 

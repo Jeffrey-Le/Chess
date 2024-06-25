@@ -48,7 +48,10 @@ void Game::openGame() {
 
     while (this->window.isOpen())
     {
-        logic->checkMate();
+        // King* playerKing = logic->getPlayerKing();
+        //
+        // if (playerKing->isCheck())
+        //     logic->getPossibleCheckedMoves();
 
         sf::Event event = customEvent.useCustomEvent();
         //sf::Event event; // CustomEvent
@@ -88,7 +91,14 @@ void Game::openGame() {
                 if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
                 {
                     if (event.mouseButton.button == sf::Mouse::Left) {
-                        temp = customEvent.squareClickLogic(this->window, &squares[i], track, i);
+                        std::unordered_map<char, int> kingPositions = logic->findKingPositions();
+
+                        King* wKing = dynamic_cast<King*>(squares[kingPositions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+                        King* bKing = dynamic_cast<King*>(squares[kingPositions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+                        std::unordered_map<char, King*> kingPieces = {{'w', wKing}, {'b', bKing}};
+
+                        temp = customEvent.squareClickLogic(kingPieces, &squares[i], track, i);
                     }
 
                     if (event.mouseButton.button == sf::Mouse::Right) {
@@ -109,11 +119,12 @@ void Game::openGame() {
 
                 std::cout << "Updating Board" << std::endl;
 
-                logic->standbyUpdate();
+                //logic->standbyUpdate();
+
+
+                logic->getPossibleCheckedMoves();
 
                 logic->updateBoard(this->board); // Update Logic
-
-                //logic->setPlayerTurn();
 
                 this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
                 this->interface->inverseWhite();

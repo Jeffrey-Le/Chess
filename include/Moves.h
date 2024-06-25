@@ -29,7 +29,7 @@ class Moves {
         uint64_t QUEEN_SIDE = 1085102592571150095ULL; // 0x0f0f0f0f0f0f0f0f
         uint64_t KING_B7 = 512ull;//18014398509481984ULL; // 0x0040000000000000
         uint64_t KNIGHT_C6 = 262144ull;//35184372088832ULL; // 0x0000200000000000
-        uint64_t NOT_PLAYER_PIECES = 0ULL;
+        uint64_t PLAYER_PIECES = 0ULL;
         uint64_t OPPOSING_PIECES = 0ULL;
         uint64_t EMPTY = 0ULL;
     public:
@@ -37,20 +37,24 @@ class Moves {
         ~Moves();
 
         std::vector<uint64_t> getPawnMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getKnightMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getBishopMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getRookMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getQueenMoves(int, Bitboard *&, Square *&) const;
-        uint64_t getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&);
+        std::vector<uint64_t> getKnightMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getBishopMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getRookMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getQueenMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&);
 
         // Helper Functions
         void blackOrWhite(bool , uint64_t, uint64_t &, int) const;
-        static bool checkKingInCheck(uint64_t const [], uint64_t);
+        static bool checkKingInCheck(std::vector<uint64_t> const&, uint64_t);
+
 
         // Setter Functions
-        void setWhiteP(uint64_t);
-        void setBlackP(uint64_t);
+        void setPlayerP(uint64_t);
+        void setOpposingP(uint64_t);
         void setEmpty(uint64_t);
+
+        // Use Functions
+        uint64_t useOpposingP();
 };
 
 #endif //MOVES_H

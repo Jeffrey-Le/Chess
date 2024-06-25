@@ -61,7 +61,7 @@ bool King::isCheck() const {
     return false;
 }
 
-void King::setCheck() {
-    this->inCheck = !this->inCheck;
+void King::setCheck(bool val) {
+    this->inCheck = val;
 }
 

@@ -25,6 +25,7 @@
 
 class GameLogic {
     private:
+        Moves moves;
         //Players
         Player *players; // 1 or 2
 
@@ -32,6 +33,12 @@ class GameLogic {
         bool playerTurn = true; // true = player 1, false = player 2 or AI
 
         bool enPeasant = true;
+
+        bool kingInCheck = false;
+
+        std::vector<int> attackingIndices;
+
+        std::unordered_map<uint64_t, bool> attackChecks; // Stores each capturing move direction: <Move, CausesCheck>
 
         int turnCounter = 0;
         // Keep Board State
@@ -42,12 +49,9 @@ class GameLogic {
         std::unordered_map<float, Bitboard*> bitBoards;
 
         Bitboard *possibleMoves;
+        Bitboard *validSquares;
 
         void setIntialBoard();
-
-        float operator<=(float &);
-
-        static bool compareNeg(float, float);
     public:
         GameLogic();
         explicit GameLogic(Board &);
@@ -56,7 +60,15 @@ class GameLogic {
         void checkMate();
 
         void getPossibleMoves(int);
+        void getPossibleCheckedMoves();
+        std::unordered_map<char, int> findKingPositions();
 
+
+        // Helpers
+        std::vector<uint64_t> generateMoves(int);
+
+        // Updates
+        void updateValidSquare();
         void updateMoves(int, int);
         void updateBoard(Board *&);
         void standbyUpdate();
@@ -65,6 +77,8 @@ class GameLogic {
         void revertBitboard();
 
         void resetPossibleMoves();
+
+        King* getPlayerKing();
 
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);
         static uint64_t bitwiseOr(Bitboard *&, Bitboard *&);

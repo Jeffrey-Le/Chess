@@ -17,7 +17,7 @@ class King : public Pawn {
         ~King() override;
 
         bool isCheck() const;
-        void setCheck();
+        void setCheck(bool);
 };
 
 #endif //KING_H

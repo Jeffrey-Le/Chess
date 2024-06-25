@@ -14,6 +14,7 @@ GameLogic::GameLogic() {
     this->curBoard = nullptr;
     this->curBitboard = new Bitboard();
     this->possibleMoves = new Bitboard();
+    this->validSquares = new Bitboard();
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -31,8 +32,8 @@ GameLogic::GameLogic(Board &board) {
 
     this->curBoard = &board;
     this->curBitboard = new Bitboard();
-
     this->possibleMoves = new Bitboard();
+    this->validSquares = new Bitboard();
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -55,21 +56,6 @@ GameLogic::~GameLogic() {
 }
 
 void GameLogic::setIntialBoard() {
-    // std::unordered_map<float, std::function<std::shared_ptr<Piece>()>> PieceInfo = {
-    //     {1.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Pawn>('w');}},
-    //     {3.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<Knight>('w');}},
-    //     {3.2f, []() -> std::shared_ptr<Piece> { return std::make_shared<Bishop>('w');}},
-    //     {5.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Rook>('w');}},
-    //     { 9.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Queen>('w');}},
-    //     {0.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<King>('w');}},
-    //     {-1.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Pawn>('b');}},
-    //     {-3.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<Knight>('b');}},
-    //     {-3.2f, []() -> std::shared_ptr<Piece> { return std::make_shared<Bishop>('b');}},
-    //     {-5.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Rook>('b');}},
-    //     { -9.0f, []() -> std::shared_ptr<Piece> { return std::make_shared<Queen>('b');}},
-    //     {-0.1f, []() -> std::shared_ptr<Piece> { return std::make_shared<King>('b');}},
-    // };
-
     Square *squares = this->curBoard->useBoard();
 
     static std::string Binary;
@@ -97,7 +83,7 @@ void GameLogic::setIntialBoard() {
                 {-0.1f, new King('b')},
             };
 
-            std::cout << "PieceVal: " << pieceVal << std::endl;
+            //std::cout << "PieceVal: " << pieceVal << std::endl;
 
             this->bitBoards[pieceVal]->updateBitboard(Binary);
 
@@ -179,103 +165,6 @@ void GameLogic::revertBitboard(){
         if ((this->bitBoards[-9.0f]->useBitboard() >> i) & 1) squares[i].changePiece(-9.0f);
         if ((this->bitBoards[-0.1f]->useBitboard() >> i) & 1) squares[i].changePiece(-0.1f);
     }
-
-//    std::cout << "Old Board" << std::endl;
-//    this->curBoard->displayBoard();
-//
-//    this->curBoard->setSquares(squares);
-//
-//    std::cout << "New Board" << std::endl;
-//    this->curBoard->displayBoard();
-}
-
-bool GameLogic::compareNeg(float x, float y) {
-    if (y > 0.0f) {
-        return (x > y);
-    }
-    return (x <= y);
-}
-
-float GameLogic::operator<=(float &other) {
-    if (other > 0.0f)
-        return (other < 0);
-
-    return (other > 0);
-}
-
-void GameLogic::getPossibleMoves(int const index) {
-    Moves moves;
-
-    Square *squares = this->curBoard->useBoard();
-
-    std::string const Binary = "0ULL";
-
-    float const pieceVal = squares[index].usePiece();
-
-    int multiplier =  (playerTurn) ? 1 : -1; // w = 1, b = -1
-
-    uint64_t notPlayerP = this->bitBoards[pieceVal]->useBitboard();
-
-    for (auto &bitBoard: this->bitBoards) {
-        if ((multiplier > 0 && bitBoard.first > 0.0f) || (multiplier < 0 && bitBoard.first < 0.0f))
-            notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
-    }
-
-    notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f * float(multiplier)]->useBitboard());
-
-    moves.setWhiteP(notPlayerP);
-
-
-    std::cout << "PlayerP: " << notPlayerP << std::endl;
-
-    uint64_t opposingP = this->bitBoards[-1.0f * float(multiplier)]->useBitboard();
-
-    for (auto &bitBoard : this->bitBoards) {
-        if (bitBoard.first == (-1.0f * float(multiplier)) || bitBoard.first == (-0.1f * float(multiplier)))
-            continue;
-
-        if ((multiplier > 0 && bitBoard.first < 0.0f) || (multiplier < 0 && bitBoard.first > 0.0f)) {
-            opposingP = bitwiseOr(opposingP, bitBoard.second->useBitboard());
-        }
-    }
-
-    std::cout << "Opposing: " << opposingP << std::endl;
-
-    moves.setBlackP(opposingP);
-
-    uint64_t const empty = ~bitwiseOr(notPlayerP, opposingP);
-    moves.setEmpty(empty);
-
-    this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
-
-    std::unordered_map<float, std::function<uint64_t()>> map = {
-        {1.0f, [&moves, this, &squares, index, opposingP]() {
-            std::vector<uint64_t> pawnMoves = moves.getPawnMoves(index, this->possibleMoves, squares);
-            return bitwiseOr(pawnMoves[0], (pawnMoves[1] & opposingP));
-        }},
-        {3.1f, [&moves, this, &squares, index]() {return moves.getKnightMoves(index, this->possibleMoves, squares);}},
-        {3.2f, [&moves, this, &squares, index]() {return moves.getBishopMoves(index, this->possibleMoves, squares);}},
-        {5.0f, [&moves, this, &squares, index]() {return moves.getRookMoves(index, this->possibleMoves, squares);}},
-        {9.0f, [&moves, this, &squares, index]() {return moves.getQueenMoves(index, this->possibleMoves, squares);}},
-        {0.1f, [&moves, this, &squares, index]() {return moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);}}
-    };
-
-    auto newBoard = map[std::abs(pieceVal)]();
-
-    this->possibleMoves->setBitboard(newBoard);
-
-    std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
-
-    for (int i = 0; i < 64; i++) {
-        if (((~this->curBitboard->useBitboard() >> i) & 1) == 1) {
-            squares[i].setValidMove(false);
-        }
-
-        if (((this->possibleMoves->useBitboard() >> i) & 1) == 1) {
-            squares[i].changeColor(sf::Color(255, 0, 0));
-            squares[i].setValidMove(true);
-        }
-    }
 }
 
 void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
@@ -293,40 +182,65 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
 
     this->curBitboard->setBitboard(newBoard);
 
-    std::cout << "New Board: " << newBoard << std::endl;
-
     // Sets the new Bitboard to the Piece
     uint64_t const newPieceBoardMask = bitwiseOr(this->bitBoards[pieceVal]->useBitboard(), newSpaceMask);
     uint64_t const newPieceBoard = bitwiseAnd(newPieceBoardMask, oldSpaceMask);
 
     this->bitBoards[pieceVal]->setBitboard(newPieceBoard);
 
-    std::cout << "New PieceVal Board: " << newPieceBoard << std::endl;
+    // Checks the Future Possible Moves for the Current Piece to See if Move Made King in Check
+    this->getPossibleMoves(clickedIndex);
 
+    this->standbyUpdate();
+
+    this->checkMate();
+
+    if (this->kingInCheck) {
+        std::unordered_map<char, int> kingPostions = this->findKingPositions();
+
+        King* wKing = dynamic_cast<King*>(squares[kingPostions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+        King* bKing = dynamic_cast<King*>(squares[kingPostions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+        King* kingInCheck = (wKing->isCheck()) ? wKing : bKing;
+
+        this->attackingIndices.push_back(clickedIndex);
+
+        std::vector<uint64_t> allMoves = this->generateMoves(clickedIndex);
+
+        for (auto &move: allMoves) {
+            if (move & this->bitBoards[kingInCheck->useVal()]->useBitboard())
+                this->attackChecks[move] = true;
+            else
+                this->attackChecks[move] = false;
+        }
+    }
+
+    // Intialize new State
     this->revertBitboard();
 }
 
 void GameLogic::updateBoard(Board *&board) {
-    //this->curBoard = board;
     this->curBoard->setSquares(board->useBoard());
 
     Square *squares = this->curBoard->useBoard();
 
-    for (int i = 0; i < 64; i++) {
-        if ((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f))
-            squares[i].setValidMove(true);
-        else
-            squares[i].setValidMove(false);
 
+    if (!kingInCheck) {
+        for (int i = 0; i < 64; i++) {
+            if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)))
+                squares[i].setValidMove(true);
+            else
+                squares[i].setValidMove(false);
+        }
     }
-}
-
-void GameLogic::resetPossibleMoves() {
-    Square *squares = this->curBoard->useBoard();
-
-    for (int i = 0; i < 64; i++) {
-        if (((this->possibleMoves->useBitboard() >> i) & 1) == 1) {
-            squares[i].resetState();
+    else {
+        for (int i = 0; i < 64; i++) {
+            if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)) && (this->validSquares->useBitboard() & (1ULL << i))) {
+                std::cout << this->validSquares->useBitboard() << std::endl;
+                squares[i].setValidMove(true);
+            }
+            else
+                squares[i].setValidMove(false);
         }
     }
 }
@@ -337,13 +251,95 @@ void GameLogic::standbyUpdate() {
     this->playerTurn = !this->playerTurn;
 }
 
-void GameLogic::checkMate() {
-    Bitboard *whiteKing = this->bitBoards[0.1f];
-    Bitboard *blackKing = this->bitBoards[-0.1f];
 
+void GameLogic::updateValidSquare() {
+    Square *squares = this->curBoard->useBoard();
+
+    std::cout << "Setting Board Valid Squares\n\n";
+
+    for (int i = 0; i < 64; i++) {
+        if (((this->validSquares->useBitboard() >> i) & 1ULL) == 1ULL) {
+            squares[i].setValidMove(true);
+        }
+    }
+}
+
+
+
+
+void GameLogic::checkMate() {
+    Square *squares = this->curBoard->useBoard();
+
+    std::unordered_map<char, int> kingPostions = this->findKingPositions();
+
+    int whiteIndex = kingPostions['w'];
+    int blackIndex = kingPostions['b'];
+
+    // Check If White King is In Check
+    if ((this->possibleMoves->useBitboard() & bitBoards[0.1f]->useBitboard()) != 0ULL) {
+        King* king = dynamic_cast<King*>(squares[whiteIndex].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+        std::cout << "White King in Check" << std::endl;
+
+        if (king != nullptr) {
+            king->setCheck(true);
+            this->kingInCheck = true;
+        }
+    }
+
+    // Check If Black King is In Check
+    if ((this->possibleMoves->useBitboard() & bitBoards[-0.1f]->useBitboard()) != 0ULL) {
+        King* king = dynamic_cast<King*>(squares[blackIndex].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+        std::cout << "Black King in Check" << std::endl;
+
+        if (king != nullptr) {
+            king->setCheck(true);
+            this->kingInCheck = true;
+        }
+    }
 
 }
 
+
+std::unordered_map<char, int> GameLogic::findKingPositions() {
+    std::unordered_map<char, int> kingPostions;
+
+    uint64_t whiteKing = this->bitBoards[0.1f]->useBitboard();
+    uint64_t blackKing = this->bitBoards[-0.1f]->useBitboard();
+
+    int whiteIndex = 0;
+    int blackIndex = 0;
+
+    while (whiteKing != 1ULL) {
+        whiteKing >>= 1ULL;
+        whiteIndex++;
+    }
+
+    while (blackKing != 1ULL) {
+        blackKing >>= 1ULL;
+        blackIndex++;
+    }
+
+    kingPostions['w'] = whiteIndex;
+    kingPostions['b'] = blackIndex;
+
+    return kingPostions;
+}
+
+King *GameLogic::getPlayerKing() {
+    Square const *squares = this->curBoard->useBoard();
+
+    std::unordered_map<char, int> kingPositions = this->findKingPositions();
+
+    King* wKing = dynamic_cast<King*>(squares[kingPositions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+    King* bKing = dynamic_cast<King*>(squares[kingPositions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+    if ((wKing == nullptr) || (bKing == nullptr))
+        return nullptr;
+
+    return (this->playerTurn) ? wKing : bKing; // w = true, b = false;
+}
 
 
 
