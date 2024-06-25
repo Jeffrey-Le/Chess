@@ -26,24 +26,21 @@
 class GameLogic {
     private:
         Moves moves;
-        //Players
+
         Player *players; // 1 or 2
 
         // General Logic
         bool playerTurn = true; // true = player 1, false = player 2 or AI
 
-        bool enPeasant = true;
+        bool enPeasant = true; // true = start of game, false = condition fails
 
         bool kingInCheck = false;
 
-        std::vector<int> attackingIndices;
-
-        std::unordered_map<uint64_t, bool> attackChecks; // Stores each capturing move direction: <Move, CausesCheck>
-
         int turnCounter = 0;
+
         // Keep Board State
-        Board *curBoard;
-        Bitboard *curBitboard;
+        Board *curBoard; // GUI
+        Bitboard *curBitboard; // Game State
 
         // Initialize Bitboards for each Piece
         std::unordered_map<float, Bitboard*> bitBoards;
@@ -51,21 +48,23 @@ class GameLogic {
         Bitboard *possibleMoves;
         Bitboard *validSquares;
 
+        std::vector<int> attackingIndices; // Stores Indices of Attacking Pieces (Max is 2)
+        std::unordered_map<uint64_t, bool> attackChecks; // Stores each capturing move direction: <Move, CausesCheck>
+
         void setIntialBoard();
     public:
         GameLogic();
         explicit GameLogic(Board &);
         ~GameLogic();
 
-        void checkMate();
-
         void getPossibleMoves(int);
-        void getPossibleCheckedMoves();
-        std::unordered_map<char, int> findKingPositions();
-
+        void getPossibleMovesInCheck();
 
         // Helpers
         std::vector<uint64_t> generateMoves(int);
+        std::unordered_map<char, int> findKingPositions();
+        King* getPlayerKing();
+        void testKingInCheck();
 
         // Updates
         void updateValidSquare();
@@ -74,12 +73,12 @@ class GameLogic {
         void standbyUpdate();
 
         void displayBitboard(char, char);
-        void revertBitboard();
 
+        // Resets
+        void revertBitboard();
         void resetPossibleMoves();
 
-        King* getPlayerKing();
-
+        // Bitwise Functions
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);
         static uint64_t bitwiseOr(Bitboard *&, Bitboard *&);
         static uint64_t bitwiseNot(Bitboard *&);

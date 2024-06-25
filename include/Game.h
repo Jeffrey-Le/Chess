@@ -18,7 +18,6 @@ class Game {
     private:
         sf::RenderWindow window;
         Board *board;
-        sf::Mouse *myMouse;
         GameInterface *interface;
     public:
         Game();

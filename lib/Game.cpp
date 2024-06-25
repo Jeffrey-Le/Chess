@@ -10,15 +10,12 @@ Game::Game() {
 
     this->board = new Board(); // Create a new board
 
-    this->myMouse = new sf::Mouse();
-
     this->interface = new GameInterface();
 }
 
 Game::~Game() {
     delete this->board;
     delete this->interface;
-    delete this->myMouse;
 }
 
 void Game::openGame() {
@@ -35,8 +32,6 @@ void Game::openGame() {
 
     Square *squares = this->board->useBoard();
 
-    Square *track = nullptr;
-
     CustomEvent customEvent(logic);
 
     for (int i = 0; i < 64; i++) {
@@ -46,17 +41,13 @@ void Game::openGame() {
             squares[i].setValidMove(false);
     }
 
+    Square *trackedSquare = nullptr;
+
     while (this->window.isOpen())
     {
-        // King* playerKing = logic->getPlayerKing();
-        //
-        // if (playerKing->isCheck())
-        //     logic->getPossibleCheckedMoves();
-
         sf::Event event = customEvent.useCustomEvent();
-        //sf::Event event; // CustomEvent
 
-       sf::Vector2i mouseCoords = sf::Mouse::getPosition(this->window);
+        sf::Vector2i mouseCoords = sf::Mouse::getPosition(this->window);
 
         this->window.clear(sf::Color(sf::Color(0, 255, 0))); // Clears Canvas
 
@@ -72,6 +63,7 @@ void Game::openGame() {
             this->window.draw(this->board->usePositions('l')[i]);
         }
 
+        // Draw Interface onto Window
         this->window.draw(this->interface->useTurnUI());
         this->window.draw(this->interface->useColorUI());
 
@@ -84,7 +76,7 @@ void Game::openGame() {
             if (event.type == sf::Event::Closed)
                 this->window.close();
 
-            bool temp = false;
+            bool stateEnd = false; // Track the end of a state (Move is Made)
 
             for (int i = 0; i < 64; i++) {
                 // Click Logic
@@ -98,7 +90,7 @@ void Game::openGame() {
 
                         std::unordered_map<char, King*> kingPieces = {{'w', wKing}, {'b', bKing}};
 
-                        temp = customEvent.squareClickLogic(kingPieces, &squares[i], track, i);
+                        stateEnd = customEvent.squareClickLogic(kingPieces, &squares[i], trackedSquare, i);
                     }
 
                     if (event.mouseButton.button == sf::Mouse::Right) {
@@ -109,7 +101,7 @@ void Game::openGame() {
                 }
             }
 
-            if (temp) {
+            if (stateEnd) {
                 // Reset State
                 for (int i = 0; i < 64; i++) {
                     squares[i].resetState();
@@ -121,11 +113,11 @@ void Game::openGame() {
 
                 //logic->standbyUpdate();
 
-
-                logic->getPossibleCheckedMoves();
+                logic->getPossibleMovesInCheck(); // Looks for Check
 
                 logic->updateBoard(this->board); // Update Logic
 
+                // Update Interface
                 this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
                 this->interface->inverseWhite();
             }

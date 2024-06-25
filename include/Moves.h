@@ -54,7 +54,7 @@ class Moves {
         void setEmpty(uint64_t);
 
         // Use Functions
-        uint64_t useOpposingP();
+        uint64_t useOpposingP() const;
 };
 
 #endif //MOVES_H

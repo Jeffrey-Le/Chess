@@ -3,8 +3,6 @@
 //
 #include "../include/GameLogic.h"
 
-#include <memory>
-
 
 GameLogic::GameLogic() {
     this->players = new Player[2];
@@ -193,7 +191,7 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
 
     this->standbyUpdate();
 
-    this->checkMate();
+    this->testKingInCheck();
 
     if (this->kingInCheck) {
         std::unordered_map<char, int> kingPostions = this->findKingPositions();
@@ -267,7 +265,7 @@ void GameLogic::updateValidSquare() {
 
 
 
-void GameLogic::checkMate() {
+void GameLogic::testKingInCheck() {
     Square *squares = this->curBoard->useBoard();
 
     std::unordered_map<char, int> kingPostions = this->findKingPositions();

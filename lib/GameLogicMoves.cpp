@@ -22,19 +22,21 @@ std::vector<uint64_t> GameLogic::generateMoves(int const index) {
 
     int multiplier =  (playerTurn) ? 1 : -1; // w = 1, b = -1
 
-    uint64_t notPlayerP = this->bitBoards[pieceVal]->useBitboard();
+    // Sets the Player Pieces
+    uint64_t playerP = this->bitBoards[pieceVal]->useBitboard();
 
     for (auto &bitBoard: this->bitBoards) {
         if ((multiplier > 0 && bitBoard.first > 0.0f) || (multiplier < 0 && bitBoard.first < 0.0f))
-            notPlayerP = bitwiseOr(notPlayerP, bitBoard.second->useBitboard());
+            playerP = bitwiseOr(playerP, bitBoard.second->useBitboard());
     }
 
     //notPlayerP = bitwiseOr(notPlayerP, this->bitBoards[-0.1f * float(multiplier)]->useBitboard());
 
-    this->moves.setPlayerP(notPlayerP);
+    this->moves.setPlayerP(playerP);
 
     //std::cout << "PlayerP: " << notPlayerP << std::endl;
 
+    // Sets the other color Pieces
     uint64_t opposingP = this->bitBoards[-1.0f * float(multiplier)]->useBitboard();
 
     for (auto &bitBoard : this->bitBoards) {
@@ -51,44 +53,22 @@ std::vector<uint64_t> GameLogic::generateMoves(int const index) {
 
     this->moves.setOpposingP(opposingP);
 
-    uint64_t const empty = ~bitwiseOr(notPlayerP, opposingP);
-    moves.setEmpty(empty);
+    // Sets Empty Pieces
+    uint64_t const empty = ~bitwiseOr(playerP, opposingP);
+    this->moves.setEmpty(empty);
 
-    this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard());
+    this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard()); // Set starting Bitboard
 
     std::unordered_map<float, std::function<std::vector<uint64_t>()>> map = {
-        {1.0f, [this, &squares, index]() {
-            return this->moves.getPawnMoves(index, this->possibleMoves, squares);
-        }},
-        {3.1f, [this, &squares, index]() {
-            return this->moves.getKnightMoves(index, this->possibleMoves, squares);
-        }},
-        {3.2f, [this, &squares, index]() {
-            return this->moves.getBishopMoves(index, this->possibleMoves, squares);
-        }},
-        {5.0f, [this, &squares, index]() {
-            return this->moves.getRookMoves(index, this->possibleMoves, squares);
-
-        }},
-        {9.0f, [this, &squares, index]() {
-           return this->moves.getQueenMoves(index, this->possibleMoves, squares);
-
-        }},
-        {0.1f, [this, &squares, index]() {
-            return this->moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);
-        }}
+        {1.0f, [this, &squares, index]() {return this->moves.getPawnMoves(index, this->possibleMoves, squares);}},
+        {3.1f, [this, &squares, index]() {return this->moves.getKnightMoves(index, this->possibleMoves, squares);}},
+        {3.2f, [this, &squares, index]() {return this->moves.getBishopMoves(index, this->possibleMoves, squares);}},
+        {5.0f, [this, &squares, index]() {return this->moves.getRookMoves(index, this->possibleMoves, squares);}},
+        {9.0f, [this, &squares, index]() {return this->moves.getQueenMoves(index, this->possibleMoves, squares);}},
+        {0.1f, [this, &squares, index]() {return this->moves.getKingMoves(index, this->bitBoards, this->possibleMoves, squares);}}
     };
 
-    auto newBoard = map[std::abs(pieceVal)]();
-
-    // for (auto &move: newBoard) {
-    //     if (move & bitBoards[-0.1f * multiplier] != 0ULL)
-    //         this->attackChecks[move] = true;
-    //     else
-    //         this->attackChecks[move] = false;
-    // }
-
-    return newBoard;
+    return map[std::abs(pieceVal)]();
 }
 
 
@@ -101,40 +81,42 @@ void GameLogic::getPossibleMoves(int const index) {
 
     std::vector<uint64_t> allMoves = this->generateMoves(index);
 
-    if (squares[index].usePiece() == (1.0f * mult))
+    if (squares[index].usePiece() == (1.0f * mult)) // Only Applies to Pawns
         allMoves[1] = (allMoves[1] & moves.useOpposingP());
 
-    uint64_t combMoves = 0ULL;
+    uint64_t comboMoves = 0ULL;
 
+    // Recurring loop that combines all possible moves
     for (auto &move: allMoves) {
-        combMoves |= move;
+        comboMoves |= move;
     }
 
-    this->possibleMoves->setBitboard(combMoves);
+    this->possibleMoves->setBitboard(comboMoves);
 
-    std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
+    //std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
 
     for (int i = 0; i < 64; i++) {
+        // Sets all empty square bits to 0
         if (((~this->curBitboard->useBitboard() >> i) & 1) == 1) {
-            //squares[i].setValidMove(false);
             this->validSquares->setBitboard(this->validSquares->useBitboard() & ~(1ULL << i));
         }
 
+        // Changes the color of bits that are possible moves and sets bits to 1
         if (((this->possibleMoves->useBitboard() >> i) & 1) == 1) {
             squares[i].changeColor(sf::Color(255, 0, 0));
-            //squares[i].setValidMove(true);
             this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
         }
     }
 
     this->updateValidSquare();
-
 }
 
 // --------------------------------------------------
 
-void GameLogic::getPossibleCheckedMoves() {
+void GameLogic::getPossibleMovesInCheck() {
     this->validSquares->setBitboard(0ULL);
+
+    float mult = (playerTurn) ? 1 : -1;
 
     Square *squares = this->curBoard->useBoard();
 
@@ -143,39 +125,23 @@ void GameLogic::getPossibleCheckedMoves() {
     King* wKing = dynamic_cast<King*>(squares[kingPositions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
     King* bKing = dynamic_cast<King*>(squares[kingPositions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
 
-   if ((wKing == nullptr) || (bKing == nullptr))
+   if ((wKing == nullptr) || (bKing == nullptr)) // If Kings Exist => Should Always unless bug occurs
        return;
 
-    if ((!wKing->isCheck()) && (!bKing->isCheck()) || (this->attackingIndices.empty())) {
-        std::cout << "NO KINGS IN CHECK" << std::endl;
+    if ((!wKing->isCheck()) && (!bKing->isCheck()) || (this->attackingIndices.empty())) { // Base Case
         this->kingInCheck = false;
         return;
     }
 
     int kingInCheckInd = (wKing->isCheck()) ? kingPositions['w'] : kingPositions['b'];
 
-    // Get the possible Moves for the attackingPiece
-    this->playerTurn = !this->playerTurn;
-    this->getPossibleMoves(attackingIndices[0]);
-    this->playerTurn = !this->playerTurn;
+    auto atkKnight = dynamic_cast<Knight*>(squares[attackingIndices[0]].useOccupiedPiece()); // Check if Piece is Knight
+    auto atkPawn = dynamic_cast<Pawn*>(squares[attackingIndices[0]].useOccupiedPiece()); // Check if Piece is Pawn
 
-    this->validSquares->setBitboard(0ULL);
-
-
-    uint64_t const attackingMoves = this->possibleMoves->useBitboard();
-    auto knight = dynamic_cast<Knight*>(squares[attackingIndices[0]].useOccupiedPiece()); // Check if Piece is Knight
-    auto pawn = dynamic_cast<Pawn*>(squares[attackingIndices[0]].useOccupiedPiece()); // Check if Piece is Pawn
-
-
-    std::cout << std::endl << "In Possible Checked Moves" << std::endl << std::endl;
-
-    std::cout << std::endl << "AttackingIndex: " << attackingIndices[0] << std::endl;
-
-
+    // Loop Each Piece Bitboard
     for (auto &board: this->bitBoards) {
-        if ((board.first > 0.0f)) {
+        if ((board.first > (0.1f * mult))) {
             uint64_t pieceBoard = board.second->useBitboard();
-
             uint64_t valid = this->validSquares->useBitboard();
 
             // Loops Over Every Bit
@@ -187,64 +153,48 @@ void GameLogic::getPossibleCheckedMoves() {
 
                     uint64_t curPieceMove = 0ULL;
 
-                    auto pawnP = dynamic_cast<Pawn*>(squares[i].useOccupiedPiece()); // Check if Piece is Pawn
+                    auto pawnP = dynamic_cast<Pawn*>(squares[i].useOccupiedPiece()); // Check if PlayerP is a Pawn
 
-                    // if (pawnP != nullptr)
-                    //     curPieceMove = this->generateMoves(i)[1];
-                    // else {
                     std::vector<uint64_t> allMoves = this->generateMoves(i);
 
                     for (auto &move: allMoves) {
                         curPieceMove |= move;
                     }
-                    //}
 
                     this->possibleMoves->setBitboard(curPieceMove);
 
-                    std::cout << "Checking Pieceboard Checks" << std::endl;
+                    bool generalCond = (pawnP == nullptr) && (this->possibleMoves->useBitboard() & (1ULL << attackingIndices[0])); // Checks every other PlayerP if it can capture piece
+                    bool pawnCond = (pawnP != nullptr) && (allMoves[1] & (1ULL << attackingIndices[0])); // Checks if PlayerP is a pawn and if it can capture piece
 
                     // If Attacking Piece is a Sliding Piece
                     // Check if Any Pieces can Capture
-
-                    bool cond1 = (pawnP == nullptr) && (this->possibleMoves->useBitboard() & (1ULL << attackingIndices[0]));
-                    bool cond2 = (pawnP != nullptr) && (allMoves[1] & (1ULL << attackingIndices[0]));
-
-                    if ((cond1 || cond2) && (knight == nullptr) && (pawn == nullptr))
+                    if ((generalCond || pawnCond) && (atkKnight == nullptr) && (atkPawn == nullptr))
                         this->validSquares->setBitboard(valid | (1ULL << i));
                     else
                         this->validSquares->setBitboard(valid & ~(1ULL << i));
 
                     // Sliding Pieces
                     // Check if Any Pieces can Block
+                    // attackChecks<BitBoard, inCheck?>
                     for (auto &move: this->attackChecks) {
-                        if (move.second && (move.first & this->possibleMoves->useBitboard()) && (knight == nullptr) && (pawn == nullptr)) {
+                        if (move.second && (move.first & this->possibleMoves->useBitboard()) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
                             this->validSquares->setBitboard(valid | (1ULL << i));
                         }
                     }
 
-
-                    // If Attacking Piece is a Knight
+                    // If Attacking Piece is a Knight or Pawn
                     // Must Capture
-                    if ((cond1 || cond2) && (knight != nullptr))
+                    if ((generalCond || pawnCond) && ((atkKnight != nullptr) || (atkPawn != nullptr)))
                         this->validSquares->setBitboard(valid | (1ULL << i));
                     else
                         this->validSquares->setBitboard(valid & ~(1ULL << i));
-
-                    // If Attacking Piece is a Pawn
-                    // Must Capture
-                    if ((this->possibleMoves->useBitboard() & (1ULL << attackingIndices[0])) && (pawn != nullptr))
-                        this->validSquares->setBitboard(valid | (1ULL << i));
-                    else
-                        this->validSquares->setBitboard(valid & ~(1ULL << i));
-
                 }
-                pieceBoard >>= 1;
+                pieceBoard >>= 1; // Move one bit
             }
         }
     }
 
-    std::cout << "AFter Loop" << std::endl;
-    this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << kingInCheckInd));
+    this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << kingInCheckInd)); // Allows King to Move
 
     this->updateValidSquare();
 }
