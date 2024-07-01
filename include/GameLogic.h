@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <functional>
 #include <memory>
+#include <unordered_set>
 
 #include "Bitboard.h"
 #include "Board.h"
@@ -50,6 +51,7 @@ class GameLogic {
 
         std::vector<int> attackingIndices; // Stores Indices of Attacking Pieces (Max is 2)
         std::unordered_map<uint64_t, bool> attackChecks; // Stores each capturing move direction: <Move, CausesCheck>
+        std::unordered_set<uint64_t> playerMovesInCheck; // Stores each possible moves the player can make while in check
 
         void setIntialBoard();
     public:
@@ -59,6 +61,8 @@ class GameLogic {
 
         void getPossibleMoves(int);
         void getPossibleMovesInCheck();
+
+        void capturePiece(int);
 
         // Helpers
         std::vector<uint64_t> generateMoves(int);
@@ -77,6 +81,9 @@ class GameLogic {
         // Resets
         void revertBitboard();
         void resetPossibleMoves();
+
+        // Use Functions
+        bool usePlayerTurn() const;
 
         // Bitwise Functions
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);

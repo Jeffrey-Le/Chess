@@ -189,8 +189,6 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     // Checks the Future Possible Moves for the Current Piece to See if Move Made King in Check
     this->getPossibleMoves(clickedIndex);
 
-    this->standbyUpdate();
-
     this->testKingInCheck();
 
     if (this->kingInCheck) {
@@ -204,6 +202,9 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
         this->attackingIndices.push_back(clickedIndex);
 
         std::vector<uint64_t> allMoves = this->generateMoves(clickedIndex);
+
+        // for (auto &move: allMoves)
+        //     std::cout << "AttackMove: " << move << std::endl;
 
         for (auto &move: allMoves) {
             if (move & this->bitBoards[kingInCheck->useVal()]->useBitboard())
@@ -222,7 +223,6 @@ void GameLogic::updateBoard(Board *&board) {
 
     Square *squares = this->curBoard->useBoard();
 
-
     if (!kingInCheck) {
         for (int i = 0; i < 64; i++) {
             if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)))
@@ -234,7 +234,6 @@ void GameLogic::updateBoard(Board *&board) {
     else {
         for (int i = 0; i < 64; i++) {
             if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)) && (this->validSquares->useBitboard() & (1ULL << i))) {
-                std::cout << this->validSquares->useBitboard() << std::endl;
                 squares[i].setValidMove(true);
             }
             else
@@ -260,6 +259,8 @@ void GameLogic::updateValidSquare() {
             squares[i].setValidMove(true);
         }
     }
+
+    //std::cout << "New Valid Squares: " << this->validSquares->useBitboard() << std::endl;;
 }
 
 
@@ -339,6 +340,10 @@ King *GameLogic::getPlayerKing() {
     return (this->playerTurn) ? wKing : bKing; // w = true, b = false;
 }
 
+
+bool GameLogic::usePlayerTurn() const {
+    return this->playerTurn;
+}
 
 
 

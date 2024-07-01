@@ -39,8 +39,24 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
                 this->logic->resetPossibleMoves();
             }
 
-            occupiedSquareClick(clickedSquare, trackedSquare);
-            this->logic->getPossibleMoves(index);
+            if ((this->logic->usePlayerTurn() && clickedSquare->usePiece() > 0.0f) || (!this->logic->usePlayerTurn() && clickedSquare->usePiece() < 0.0f)) {
+                occupiedSquareClick(clickedSquare, trackedSquare);
+                this->logic->getPossibleMoves(index);
+            }
+            else if (trackedSquare != nullptr) {
+                int const diffIndex = trackedSquare - clickedSquare;
+                int const temp = index + diffIndex;
+
+                this->logic->capturePiece(index);
+                //this->captureSquareClick(clickedSquare, trackedSquare);
+                emptySquareClick(clickedSquare, trackedSquare);
+
+                if (kingInCheck != nullptr && kingInCheck->isCheck())
+                    kingInCheck->setCheck(false);
+
+                this->logic->updateMoves(index, temp);
+                return true;
+            }
         }
     }
     else
@@ -73,6 +89,16 @@ void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSqua
 
     trackedSquare->setOccupiedPiece(new Piece());
 }
+
+void CustomEvent::captureSquareClick(Square *&clickedSquare, Square *&trackedSquare) {
+    //std::cout << "In Capture Square Click" << std::endl;
+
+    //clickedSquare->setValidMove(false);
+    clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
+
+    trackedSquare->setOccupiedPiece(new Piece());
+}
+
 
 
 sf::Event CustomEvent::useCustomEvent() const{

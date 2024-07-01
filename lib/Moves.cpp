@@ -163,6 +163,9 @@ std::vector<uint64_t> Moves::getBishopMoves(int const index, Bitboard *&board, S
 
         if ((curFile + i) < 8 )
             bishopMoves[0] |= (BITBOARD >> (7 * i)) & ~this->FILE_A;
+
+        if ((this->OPPOSING_PIECES & (BITBOARD >> (7 * i))) != 0ULL)
+            break;
     }
 
     for (int  i = 1; i < 7; i++) {
@@ -171,6 +174,9 @@ std::vector<uint64_t> Moves::getBishopMoves(int const index, Bitboard *&board, S
 
         if ((curFile - i) >= 0)
             bishopMoves[1] |= (BITBOARD >> (9 * i)) & ~this->FILE_H;
+
+        if ((this->OPPOSING_PIECES & (BITBOARD >> (9 * i))) != 0ULL)
+            break;
     }
 
     // Down Moves
@@ -180,6 +186,9 @@ std::vector<uint64_t> Moves::getBishopMoves(int const index, Bitboard *&board, S
 
         if ((curFile + i) < 8)
              bishopMoves[2] |= (BITBOARD << (9 * i)) & ~this->FILE_A;
+
+        if ((this->OPPOSING_PIECES & (BITBOARD << (9 * i))) != 0ULL)
+            break;
     }
 
     for (int  i = 1; i < 7; i++) {
@@ -188,6 +197,9 @@ std::vector<uint64_t> Moves::getBishopMoves(int const index, Bitboard *&board, S
 
         if ((curFile - i) >= 0)
              bishopMoves[3] |= (BITBOARD << (7 * i)) & ~this->FILE_H;
+
+        if ((this->OPPOSING_PIECES & (BITBOARD << (7 * i))) != 0ULL)
+            break;
     }
 
     bishopMoves[0] &= ~this->RANK_1;
@@ -215,7 +227,11 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
         if ((this->PLAYER_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
             break;
 
+
         rookMoves[0] |= (BITBOARD >> (8 * i));
+
+        if ((this->OPPOSING_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
+            break;
     }
 
     for (int  i = 1; i < 7; i++) {
@@ -223,6 +239,9 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
             break;
 
         rookMoves[1] |= (BITBOARD << (8 * i));
+
+        if ((this->OPPOSING_PIECES & (BITBOARD << (8 * i))) != 0ULL)
+            break;
     }
 
     for (int i = 1; i < curFile+1; i++) {
@@ -230,6 +249,9 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
             break;
 
         rookMoves[2] |= (BITBOARD >> i) & ~this->FILE_H;
+
+        if (((this->OPPOSING_PIECES & (BITBOARD >> i)) != 0ULL))
+            break;
     }
 
     for (int i = 1; i < 8-curFile; i++) {
@@ -237,6 +259,9 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
             break;
 
         rookMoves[3] |= (BITBOARD << i) & ~this->FILE_A;
+
+        if (((this->OPPOSING_PIECES & (BITBOARD << i)) != 0ULL))
+            break;
     }
 
     return rookMoves;

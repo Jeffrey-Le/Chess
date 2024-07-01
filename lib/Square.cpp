@@ -92,7 +92,6 @@ void Square::setOccupiedPiece(Piece *newPiece) {
     sf::Vector2f const pos = this->squareSpace->getPosition();
 
     this->occupiedPiece->setPosition(pos.x, pos.y);
-
 }
 
 Piece *Square::useOccupiedPiece() const {

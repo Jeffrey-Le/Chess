@@ -85,13 +85,19 @@ void GameLogic::getPossibleMoves(int const index) {
         allMoves[1] = (allMoves[1] & moves.useOpposingP());
 
     uint64_t comboMoves = 0ULL;
+    uint64_t movesInCheck = 0ULL;
 
     // Recurring loop that combines all possible moves
-    for (auto &move: allMoves) {
+    for (auto &move: allMoves)
         comboMoves |= move;
-    }
 
-    this->possibleMoves->setBitboard(comboMoves);
+    for (auto &move: this->playerMovesInCheck)
+        movesInCheck |= move;
+
+    if (this->kingInCheck && squares[index].usePiece() != (0.1f * mult)) // If Player is In Check => Ensures the Possilbe Moves are valid for the Piece
+        this->possibleMoves->setBitboard(comboMoves & movesInCheck);
+    else
+        this->possibleMoves->setBitboard(comboMoves); // Normal Moves
 
     //std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
 
@@ -106,7 +112,12 @@ void GameLogic::getPossibleMoves(int const index) {
             squares[i].changeColor(sf::Color(255, 0, 0));
             this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
         }
+        else
+            this->validSquares->setBitboard(this->validSquares->useBitboard() & ~(1ULL << i));
     }
+
+    if (kingInCheck && ((comboMoves & (1ULL << attackingIndices[0])) == 0ULL)) // If King is in Check but not in range to capture
+        squares[attackingIndices[0]].setValidMove(false);
 
     this->updateValidSquare();
 }
@@ -140,15 +151,12 @@ void GameLogic::getPossibleMovesInCheck() {
 
     // Loop Each Piece Bitboard
     for (auto &board: this->bitBoards) {
-        if ((board.first > (0.1f * mult))) {
+        if ((board.first > (0.1f * mult)) || (board.first < (0.1f * mult))) {
             uint64_t pieceBoard = board.second->useBitboard();
             uint64_t valid = this->validSquares->useBitboard();
 
             // Loops Over Every Bit
             for (int i = 0; i < 64; i++) {
-                if (pieceBoard == 1ULL)
-                    break;
-
                 if ((pieceBoard & 1ULL) == 1ULL) { // Means It Found a Peice
 
                     uint64_t curPieceMove = 0ULL;
@@ -168,8 +176,10 @@ void GameLogic::getPossibleMovesInCheck() {
 
                     // If Attacking Piece is a Sliding Piece
                     // Check if Any Pieces can Capture
-                    if ((generalCond || pawnCond) && (atkKnight == nullptr) && (atkPawn == nullptr))
+                    if ((generalCond || pawnCond) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
                         this->validSquares->setBitboard(valid | (1ULL << i));
+                        this->playerMovesInCheck.insert((1ULL << attackingIndices[0]));
+                    }
                     else
                         this->validSquares->setBitboard(valid & ~(1ULL << i));
 
@@ -179,14 +189,17 @@ void GameLogic::getPossibleMovesInCheck() {
                     for (auto &move: this->attackChecks) {
                         if (move.second && (move.first & this->possibleMoves->useBitboard()) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
                             this->validSquares->setBitboard(valid | (1ULL << i));
+                            this->playerMovesInCheck.insert(this->possibleMoves->useBitboard() & move.first);
                         }
                     }
 
                     // If Attacking Piece is a Knight or Pawn
                     // Must Capture
-                    if ((generalCond || pawnCond) && ((atkKnight != nullptr) || (atkPawn != nullptr)))
+                    if ((generalCond || pawnCond) && ((atkKnight != nullptr) || (atkPawn != nullptr))) {
                         this->validSquares->setBitboard(valid | (1ULL << i));
-                    else
+                        this->playerMovesInCheck.insert((1ULL << attackingIndices[0]));
+                    }
+                    else if ((atkKnight != nullptr) || (atkPawn != nullptr))
                         this->validSquares->setBitboard(valid & ~(1ULL << i));
                 }
                 pieceBoard >>= 1; // Move one bit
@@ -198,3 +211,12 @@ void GameLogic::getPossibleMovesInCheck() {
 
     this->updateValidSquare();
 }
+
+void GameLogic::capturePiece(int const index) {
+    Square *squares = this->curBoard->useBoard();
+
+    uint64_t const BITBOARD = ~(1ULL << index);
+
+    this->bitBoards[squares[index].usePiece()]->setBitboard(this->bitBoards[squares[index].usePiece()]->useBitboard() & BITBOARD);
+}
+

@@ -111,7 +111,7 @@ void Game::openGame() {
 
                 std::cout << "Updating Board" << std::endl;
 
-                //logic->standbyUpdate();
+                logic->standbyUpdate();
 
                 logic->getPossibleMovesInCheck(); // Looks for Check
 
