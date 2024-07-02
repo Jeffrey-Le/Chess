@@ -74,52 +74,13 @@ std::vector<uint64_t> GameLogic::generateMoves(int const index) {
 void GameLogic::getPossibleMoves(int const index) {
     this->validSquares->setBitboard(0ULL);
 
-    float mult = (playerTurn) ? 1 : -1;
+    float multiplier = (this->playerTurn) ? 1.0f : -1.0f;
 
     Square *squares = this->curBoard->useBoard();
 
-    // ALl Files and Ranks
-    int file = index % 8;
-    int rank = index / 8;
-    int mainDiag = file - rank;
-    int antiDiag = file + rank;
-
-    uint64_t fileBitboard = 0ULL;
-    uint64_t rankBitboard = 0ULL;
-    uint64_t mainDiagBitboard = 0ULL;
-    uint64_t antiDiagBitboard = 0ULL;
-
-    for (int i = 0; i < 8; ++i) {
-        fileBitboard |= (1ULL << (file + 8 * i));
-    }
-
-    // Set bits for the rank bitboard
-    for (int i = 0; i < 8; ++i) {
-        rankBitboard |= (1ULL << (rank * 8 + i));
-    }
-
-    for (int r = 0; r < 8; ++r) {
-        for (int f = 0; f < 8; ++f) {
-            if (f - r == mainDiag) {
-                mainDiagBitboard |= (1ULL << (r * 8 + f));
-            }
-        }
-    }
-
-    // Set bits for the anti-diagonal bitboard
-    for (int r = 0; r < 8; ++r) {
-        for (int f = 0; f < 8; ++f) {
-            if (f + r == antiDiag) {
-                antiDiagBitboard |= (1ULL << (r * 8 + f));
-            }
-        }
-    }
-
-    uint64_t allDir = 0ULL;
-
     std::vector<uint64_t> allMoves = this->generateMoves(index);
 
-    if (squares[index].usePiece() == (1.0f * mult)) // Only Applies to Pawns
+    if (squares[index].usePiece() == (1.0f * multiplier)) // Only Applies to Pawns
         allMoves[1] = (allMoves[1] & moves.useOpposingP());
 
     uint64_t comboMoves = 0ULL;
@@ -132,15 +93,13 @@ void GameLogic::getPossibleMoves(int const index) {
     for (auto &move: this->playerMovesInCheck)
         movesInCheck |= move;
 
-    if (this->kingInCheck && squares[attackingIndices[0]].usePiece() == (-5.0f * mult))
-        allDir |= fileBitboard | rankBitboard;
-    if (this->kingInCheck && squares[attackingIndices[0]].usePiece() == (-3.2f * mult))
-        allDir |= mainDiagBitboard | antiDiagBitboard;
+    if (this->kingInCheck && squares[index].usePiece() == (0.1f * multiplier) && ((comboMoves & (1ULL << attackingIndices[0])) != 0ULL)) // If King is in Check but not in range to capture
+        movesInCheck &= ~(1ULL << attackingIndices[0]);
 
-    if (this->kingInCheck && squares[index].usePiece() != (0.1f * mult)) // If Player is In Check => Ensures the Possilbe Moves are valid for the Piece
+    if (this->kingInCheck && squares[index].usePiece() != (0.1f * multiplier)) // If Player is In Check => Ensures the Possilbe Moves are valid for the Piece
         this->possibleMoves->setBitboard(comboMoves & movesInCheck);
     else
-        this->possibleMoves->setBitboard(comboMoves & (~movesInCheck & ~allDir)); // Normal Moves
+        this->possibleMoves->setBitboard(comboMoves & ~movesInCheck); // Normal Moves
 
     //std::cout << "PossibleMoves: " << this->possibleMoves->useBitboard() << std::endl;
 
@@ -156,12 +115,7 @@ void GameLogic::getPossibleMoves(int const index) {
             squares[i].changeColor(sf::Color(255, 0, 0));
             this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
         }
-        else
-            this->validSquares->setBitboard(this->validSquares->useBitboard() & ~(1ULL << i));
     }
-
-    if (kingInCheck && squares[index].usePiece() == (0.1f * mult) && ((comboMoves & (1ULL << attackingIndices[0])) == 0ULL)) // If King is in Check but not in range to capture
-        squares[attackingIndices[0]].setValidMove(false);
 
     this->updateValidSquare();
 }

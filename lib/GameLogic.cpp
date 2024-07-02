@@ -220,13 +220,15 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
 
 void GameLogic::updateBoard(Board *&board) {
     this->curBoard->setSquares(board->useBoard());
+    //this->validSquares->setBitboard(0ULL);
 
     Square *squares = this->curBoard->useBoard();
 
     if (!kingInCheck) {
         for (int i = 0; i < 64; i++) {
             if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)))
-                squares[i].setValidMove(true);
+                //squares[i].setValidMove(true);
+                this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
             else
                 squares[i].setValidMove(false);
         }
@@ -234,12 +236,16 @@ void GameLogic::updateBoard(Board *&board) {
     else {
         for (int i = 0; i < 64; i++) {
             if (((this->playerTurn && squares[i].usePiece() > 0.0f) || (!this->playerTurn && squares[i].usePiece() < 0.0f)) && (this->validSquares->useBitboard() & (1ULL << i))) {
-                squares[i].setValidMove(true);
+                this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
+                //squares[i].setValidMove(true);
             }
             else
                 squares[i].setValidMove(false);
         }
     }
+
+
+    this->updateValidSquare();
 }
 
 

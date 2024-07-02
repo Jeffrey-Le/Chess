@@ -24,7 +24,7 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
             int const diffIndex = trackedSquare - clickedSquare;
             int const temp = index + diffIndex;
 
-            emptySquareClick(clickedSquare, trackedSquare);
+            swapSquareClick(clickedSquare, trackedSquare);
 
             if (kingInCheck != nullptr && kingInCheck->isCheck())
                 kingInCheck->setCheck(false);
@@ -48,8 +48,7 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
                 int const temp = index + diffIndex;
 
                 this->logic->capturePiece(index);
-                //this->captureSquareClick(clickedSquare, trackedSquare);
-                emptySquareClick(clickedSquare, trackedSquare);
+                swapSquareClick(clickedSquare, trackedSquare);
 
                 if (kingInCheck != nullptr && kingInCheck->isCheck())
                     kingInCheck->setCheck(false);
@@ -76,7 +75,7 @@ void CustomEvent::occupiedSquareClick(Square *&clickedSquare, Square *& trackedS
 
 }
 
-void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSquare) {
+void CustomEvent::swapSquareClick(Square *&clickedSquare, Square *& trackedSquare) {
     //std::cout << "Empty" << std::endl;
 
     Pawn* pawn = dynamic_cast<Pawn*>(trackedSquare->useOccupiedPiece());
@@ -89,16 +88,6 @@ void CustomEvent::emptySquareClick(Square *&clickedSquare, Square *& trackedSqua
 
     trackedSquare->setOccupiedPiece(new Piece());
 }
-
-void CustomEvent::captureSquareClick(Square *&clickedSquare, Square *&trackedSquare) {
-    //std::cout << "In Capture Square Click" << std::endl;
-
-    //clickedSquare->setValidMove(false);
-    clickedSquare->setOccupiedPiece(trackedSquare->useOccupiedPiece());
-
-    trackedSquare->setOccupiedPiece(new Piece());
-}
-
 
 
 sf::Event CustomEvent::useCustomEvent() const{

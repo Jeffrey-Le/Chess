@@ -22,8 +22,7 @@ class CustomEvent {
 
         bool squareClickLogic(std::unordered_map<char, King*>, Square *, Square *&, int) const;
         static void occupiedSquareClick(Square *&, Square *&);
-        static void emptySquareClick(Square *&, Square *&);
-        static void captureSquareClick(Square *&, Square *&);
+        static void swapSquareClick(Square *&, Square *&);
 
         sf::Event useCustomEvent() const;
 };

@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 
+
 class Piece {
     protected:
         float value; // How to track piece in Classes
@@ -17,6 +18,7 @@ class Piece {
 
         sf::Texture texture;
         sf::Sprite sprite;
+
     public:
         Piece();
         explicit Piece(bool);

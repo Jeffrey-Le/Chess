@@ -285,6 +285,52 @@ std::vector<uint64_t> Moves::getQueenMoves(int const index, Bitboard *&board, Sq
 std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<float, Bitboard*> bitBoards, Bitboard *&board, Square *&squares) {
     // std::cout << "In King Moves" << std::endl;
 
+    // TODO: FIND A WAY TO MAKE SURE KING IS UNABLE TO MOVE SPACES INTO CHECK
+
+    // ALl Files and Ranks
+    int file = index % 8;
+    int rank = index / 8;
+    int mainDiag = file - rank;
+    int antiDiag = file + rank;
+
+    uint64_t fileBitboard = 0ULL;
+    uint64_t rankBitboard = 0ULL;
+    uint64_t mainDiagBitboard = 0ULL;
+    uint64_t antiDiagBitboard = 0ULL;
+
+    for (int i = 0; i < 8; ++i) {
+        fileBitboard |= (1ULL << (file + 8 * i));
+    }
+
+    // Set bits for the rank bitboard
+    for (int i = 0; i < 8; ++i) {
+        rankBitboard |= (1ULL << (rank * 8 + i));
+    }
+
+    for (int r = 0; r < 8; ++r) {
+        for (int f = 0; f < 8; ++f) {
+            if (f - r == mainDiag) {
+                mainDiagBitboard |= (1ULL << (r * 8 + f));
+            }
+        }
+    }
+
+    // Set bits for the anti-diagonal bitboard
+    for (int r = 0; r < 8; ++r) {
+        for (int f = 0; f < 8; ++f) {
+            if (f + r == antiDiag) {
+                antiDiagBitboard |= (1ULL << (r * 8 + f));
+            }
+        }
+    }
+
+    uint64_t allDir = 0ULL;
+
+//    if (this->kingInCheck && squares[attackingIndices[0]].usePiece() == (-5.0f * mult))
+//        allDir |= fileBitboard | rankBitboard;
+//    if (this->kingInCheck && squares[attackingIndices[0]].usePiece() == (-3.2f * mult))
+//        allDir |= mainDiagBitboard | antiDiagBitboard;
+
     std::vector<uint64_t> kingMoves;
 
     uint64_t const newSpaceMask = 1ULL << index;
@@ -331,18 +377,40 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
         if ((opposingBoard & pieceBoard) & 1ULL) {
             std::vector<uint64_t> allBishopMoves = this->getBishopMoves(curPieceIndex, bitBoards[-3.2f * multiplier], squares);
 
-            for (auto &move: allBishopMoves)
-                bishopMoves |= move;
+            int pieceFile = curPieceIndex % 8;
+            int pieceRank = curPieceIndex / 8;
+
+            for (auto &move: allBishopMoves) {
+                if ((move & newSpaceMask) && ((pieceFile - pieceRank) == mainDiag))
+                    bishopMoves |= mainDiagBitboard;
+                else if ((move & newSpaceMask) && ((pieceFile + pieceRank) == antiDiag))
+                    bishopMoves |= antiDiagBitboard;
+                else
+                    bishopMoves |= move;
+            }
+
+            bishopMoves &= ~(1ULL << curPieceIndex);
         }
 
         // Rook
         pieceBoard = (bitBoards[-5.0f * multiplier]->useBitboard() >> curPieceIndex);
 
         if ((opposingBoard & pieceBoard) & 1ULL) {
-           std::vector<uint64_t> allRookMoves =this->getRookMoves(curPieceIndex, bitBoards[-5.0f * multiplier], squares);
+           std::vector<uint64_t> allRookMoves = this->getRookMoves(curPieceIndex, bitBoards[-5.0f * multiplier], squares);
 
-            for (auto &move: allRookMoves)
-                rookMoves |= move;
+            int pieceFile = curPieceIndex % 8;
+            int pieceRank = curPieceIndex / 8;
+
+            for (auto &move: allRookMoves) {
+                if ((move & newSpaceMask) && (pieceFile == file))
+                    rookMoves |= fileBitboard;
+                else if ((move & newSpaceMask) && (pieceRank == rank))
+                    rookMoves |= rankBitboard;
+                else
+                    rookMoves |= move;
+            }
+
+            rookMoves &= ~(1ULL << curPieceIndex);
         }
 
         // Queen
@@ -351,8 +419,23 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
         if ((opposingBoard & pieceBoard) & 1ULL) {
             std::vector<uint64_t> allQueenMoves = this->getQueenMoves(curPieceIndex, bitBoards[-9.0f * multiplier], squares);
 
-            for (auto &move: allQueenMoves)
-                queenMoves |= move;
+            int pieceFile = curPieceIndex % 8;
+            int pieceRank = curPieceIndex / 8;
+
+            for (auto &move: allQueenMoves) {
+                if ((move & newSpaceMask) && (pieceFile == file))
+                    queenMoves |= fileBitboard;
+                else if ((move & newSpaceMask) && (pieceRank == rank))
+                    queenMoves |= rankBitboard;
+                else if ((move & newSpaceMask) && ((pieceFile - pieceRank) == mainDiag))
+                    queenMoves |= mainDiagBitboard;
+                else if ((move & newSpaceMask) && ((pieceFile + pieceRank) == antiDiag))
+                    queenMoves |= antiDiagBitboard;
+                else
+                    queenMoves |= move;
+            }
+
+            queenMoves &= ~(1ULL << curPieceIndex);
         }
 
         opposingBoard >>= 1;
@@ -365,7 +448,6 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
     tempPlayerP = this->PLAYER_PIECES;
     this->setPlayerP(this->OPPOSING_PIECES);
     this->setOpposingP(tempPlayerP);
-
 
 
     // Directions: NW, N, NE, W, E, SW, S, SE
