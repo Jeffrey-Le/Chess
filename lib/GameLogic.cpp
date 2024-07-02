@@ -254,10 +254,14 @@ void GameLogic::updateValidSquare() {
 
     std::cout << "Setting Board Valid Squares\n\n";
 
+    char color = (this->playerTurn) ? 'w' : 'b';
+
     for (int i = 0; i < 64; i++) {
         if (((this->validSquares->useBitboard() >> i) & 1ULL) == 1ULL) {
             squares[i].setValidMove(true);
         }
+        else if ((squares[i].usePiece() > 0.0f && color == 'b') || (squares[i].usePiece() < 0.0f && color == 'w'))
+            squares[i].setValidMove(false);
     }
 
     //std::cout << "New Valid Squares: " << this->validSquares->useBitboard() << std::endl;;
@@ -339,6 +343,43 @@ King *GameLogic::getPlayerKing() {
 
     return (this->playerTurn) ? wKing : bKing; // w = true, b = false;
 }
+
+
+bool GameLogic::lookForCheckmate() {
+    Square *squares = this->curBoard->useBoard();
+    std::unordered_map<char, int> kingPos = this->findKingPositions();
+    King *king = getPlayerKing();
+
+    char const color = (king->checkWhite()) ? 'w' : 'b';
+
+    if (this->kingInCheck && king->isCheck()) {
+
+        // Generate Moves for all pieces
+        std::vector<uint64_t> allMoves = this->generateMoves(kingPos[color]);
+
+        uint64_t comboMoves = 0ULL;
+
+        for (auto &move: allMoves)
+            comboMoves |= move;
+
+        for (auto &move: this->playerMovesInCheck) {
+            uint64_t board = move;
+            for (int i = 0; i < 64; i++) {
+                if ((board & 1ULL) == 1ULL) {
+                    if (squares[i].checkValid())
+                        comboMoves |= move;
+                }
+                board >>= 1ULL;
+            }
+        }
+
+        if (comboMoves == 0ULL)
+            return true;
+    }
+
+    return false;
+}
+
 
 
 bool GameLogic::usePlayerTurn() const {

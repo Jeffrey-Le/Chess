@@ -51,7 +51,7 @@ float Piece::useVal() const{
     return this->value;
 }
 
-bool Piece::checkWhite() {
+bool Piece::checkWhite() const {
     if (this->isWhite)
         return true;
 

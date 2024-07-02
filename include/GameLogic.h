@@ -64,6 +64,8 @@ class GameLogic {
 
         void capturePiece(int);
 
+        bool lookForCheckmate();
+
         // Helpers
         std::vector<uint64_t> generateMoves(int);
         std::unordered_map<char, int> findKingPositions();

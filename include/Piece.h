@@ -34,7 +34,7 @@ class Piece {
 
         float useVal() const;
 
-        bool checkWhite();
+        bool checkWhite() const;
 };
 
 #endif //CHESS_PIECE_H
