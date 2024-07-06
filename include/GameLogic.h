@@ -13,6 +13,7 @@
 
 #include "Bitboard.h"
 #include "Board.h"
+#include "GameInterface.h"
 
 #include "Pawn.h"
 #include "Knight.h"
@@ -33,7 +34,8 @@ class GameLogic {
         // General Logic
         bool playerTurn = true; // true = player 1, false = player 2 or AI
 
-        bool enPeasant = true; // true = start of game, false = condition fails
+        bool enPeasant = false; // true = start of game, false = condition fails
+        int enPeasontPos = -1;
 
         bool kingInCheck = false;
 
@@ -42,6 +44,7 @@ class GameLogic {
         // Keep Board State
         Board *curBoard; // GUI
         Bitboard *curBitboard; // Game State
+        GameInterface *interface; // Interface State
 
         // Initialize Bitboards for each Piece
         std::unordered_map<float, Bitboard*> bitBoards;
@@ -56,7 +59,7 @@ class GameLogic {
         void setIntialBoard();
     public:
         GameLogic();
-        explicit GameLogic(Board &);
+        explicit GameLogic(Board &, GameInterface &);
         ~GameLogic();
 
         void getPossibleMoves(int);
@@ -65,6 +68,7 @@ class GameLogic {
         void capturePiece(int);
 
         bool lookForCheckmate();
+        void lookForEnPeasant(int, int);
 
         // Helpers
         std::vector<uint64_t> generateMoves(int);

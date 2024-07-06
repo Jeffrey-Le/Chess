@@ -13,6 +13,14 @@ Player::~Player() {
     delete this->color;
 }
 
+void Player::incrementTurn() {
+    this->turn++;
+}
+
+int Player::useTurn() {
+    return this->turn;
+}
+
 std::string Player::getColor() const{
     return this->colorString;
 }
@@ -26,3 +34,4 @@ void Player::setColor(std::string colorString) {
     if (colorString == "white")
         this->colorString = "White";
 }
+

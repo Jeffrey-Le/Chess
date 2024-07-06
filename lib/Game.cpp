@@ -28,7 +28,7 @@ void Game::openGame() {
 
     //this->board->displayBoard();
 
-    auto *logic = new GameLogic(*this->board);
+    auto *logic = new GameLogic(*this->board, *this->interface);
 
     Square *squares = this->board->useBoard();
 
@@ -68,6 +68,7 @@ void Game::openGame() {
         // Draw Interface onto Window
         this->window.draw(this->interface->useTurnUI());
         this->window.draw(this->interface->useColorUI());
+        this->window.draw(this->interface->useScoreUI());
 
         this->window.display(); // Display
 
@@ -123,6 +124,7 @@ void Game::openGame() {
                     mate = logic->lookForCheckmate();
 
                     // Update Interface
+                    this->interface->setScoreUI();
                     this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
                     this->interface->inverseWhite();
                 }

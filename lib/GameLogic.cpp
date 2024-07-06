@@ -13,6 +13,7 @@ GameLogic::GameLogic() {
     this->curBitboard = new Bitboard();
     this->possibleMoves = new Bitboard();
     this->validSquares = new Bitboard();
+    this->interface = nullptr;
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -23,7 +24,7 @@ GameLogic::GameLogic() {
 
 }
 
-GameLogic::GameLogic(Board &board) {
+GameLogic::GameLogic(Board &board, GameInterface &interface) {
     this->players = new Player[2];
 
     players[1].setColor("Black");
@@ -32,6 +33,7 @@ GameLogic::GameLogic(Board &board) {
     this->curBitboard = new Bitboard();
     this->possibleMoves = new Bitboard();
     this->validSquares = new Bitboard();
+    this->interface = &interface;
 
     float values[] = {1.0, 3.1, 3.2, 5.0, 9.0, 0.1};
 
@@ -166,7 +168,25 @@ void GameLogic::revertBitboard(){
 }
 
 void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
-    auto const *squares = this->curBoard->useBoard();
+    auto *squares = this->curBoard->useBoard();
+
+    if (this->enPeasant) {
+        Bitboard *opposingPawn = (this->playerTurn) ? this->bitBoards[-1.0f] : this->bitBoards[1.0f];
+
+        int capIndex = 0;
+
+        if ((1ULL << (clickedIndex + 8)) & opposingPawn->useBitboard() && this->playerTurn)
+            capIndex = clickedIndex + 8;
+        else if ((1ULL << (clickedIndex - 8)) & opposingPawn->useBitboard() && !this->playerTurn)
+            capIndex = clickedIndex - 8;
+
+        this->capturePiece(capIndex);
+
+        squares[capIndex].setOccupiedPiece(new Piece());
+
+        this->enPeasant = false;
+        this->enPeasontPos = -1;
+    }
 
     float const pieceVal = squares[clickedIndex].usePiece();
 
@@ -185,6 +205,16 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     uint64_t const newPieceBoard = bitwiseAnd(newPieceBoardMask, oldSpaceMask);
 
     this->bitBoards[pieceVal]->setBitboard(newPieceBoard);
+
+    // Check En Pesant
+
+
+    this->lookForEnPeasant(clickedIndex, trackedIndex);
+
+    if (this->enPeasant)
+        this->enPeasontPos = clickedIndex;
+    else
+        this->enPeasontPos = -1;
 
     // Checks the Future Possible Moves for the Current Piece to See if Move Made King in Check
     this->getPossibleMoves(clickedIndex);
@@ -207,6 +237,7 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
         //     std::cout << "AttackMove: " << move << std::endl;
 
         for (auto &move: allMoves) {
+            move &= ~(1ULL << clickedIndex);
             if (move & this->bitBoards[kingInCheck->useVal()]->useBitboard())
                 this->attackChecks[move] = true;
             else
@@ -368,22 +399,27 @@ bool GameLogic::lookForCheckmate() {
         for (auto &move: allMoves)
             comboMoves |= move;
 
-        for (auto &move: this->playerMovesInCheck) {
-            uint64_t board = move;
-            for (int i = 0; i < 64; i++) {
-                if ((board & 1ULL) == 1ULL) {
-                    if (squares[i].checkValid())
-                        comboMoves |= move;
-                }
-                board >>= 1ULL;
-            }
-        }
+        std::cout << this->validSquares->useBitboard() << std::endl;
 
-        if (comboMoves == 0ULL)
+        if (comboMoves == 0ULL && (this->validSquares->useBitboard() == (1ULL << kingPos[color])))
             return true;
     }
 
     return false;
+}
+
+void GameLogic::lookForEnPeasant(int clickedIndex, int trackedIndex) {
+    // CHeck to see that the opposing pawn has made a 2 move forwards
+    if (((clickedIndex - 16) != trackedIndex && !this->playerTurn) || ((clickedIndex + 16) != trackedIndex && this->playerTurn))
+        return;
+
+    int left = clickedIndex - 1;
+    int right = clickedIndex + 1;
+
+    Bitboard *opposingPawn = (this->playerTurn) ? this->bitBoards[-1.0f] : this->bitBoards[1.0f];
+
+    if ((((1ULL << left) & opposingPawn->useBitboard()) != 0ULL) || (((1ULL << right) & opposingPawn->useBitboard()) != 0ULL))
+        this->enPeasant = true;
 }
 
 

@@ -20,7 +20,7 @@ void Moves::blackOrWhite(bool isNeg, uint64_t const BITBOARD, uint64_t &mask, in
 }
 
 
-std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares) const {
+std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares, int enPeasantPos) const {
     // std::cout << "In Pawn Moves" << std::endl;
 
     uint64_t const piecePos = 1ULL << index;
@@ -28,6 +28,17 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     uint64_t const BITBOARD = board->useBitboard() & (piecePos);
 
     bool isNeg = (squares[index].usePiece() < 0.0f);
+
+    uint64_t enPeasantBoard = 0ULL;
+
+    if (enPeasantPos > -1)
+    {
+        if (!isNeg && (BITBOARD & this->RANK_5)) {
+            enPeasantBoard = ((1ULL << enPeasantPos) >> 8) & this->EMPTY; // white can en peasant
+        }
+        else if ((BITBOARD & this->RANK_4))
+            enPeasantBoard = ((1ULL << enPeasantPos) << 8) & this->EMPTY; // black can en peasant
+    }
 
     uint64_t mask = 0ULL;
 
@@ -46,6 +57,9 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     blackOrWhite(isNeg, BITBOARD, mask, 9);
 
     pawnCaptures |= mask;
+
+    // En Peasant
+    pawnBasicMoves |= enPeasantBoard;
 
     // Move 1 Square
     mask = this->EMPTY;
@@ -91,6 +105,11 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     blackOrWhite(isNeg, BITBOARD, mask, 8);
 
     pawnBasicMoves |= mask;
+
+    pawnBasicMoves &= ~(1ULL << index);
+    pawnCaptures &= ~(1ULL << index);
+
+    std::cout << "Pawn CAptures: " << pawnCaptures << std::endl;
 
     return std::vector<uint64_t>({pawnBasicMoves, pawnCaptures});
 }
@@ -139,6 +158,9 @@ std::vector<uint64_t> Moves::getKnightMoves(int const index, Bitboard *&board, S
 
     for (auto &move: knightMoves)
         move &= ~(this->PLAYER_PIECES);
+
+    for (auto &move: knightMoves)
+        move &= ~(1ULL << index);
 
     return knightMoves;
 }
@@ -209,6 +231,9 @@ std::vector<uint64_t> Moves::getBishopMoves(int const index, Bitboard *&board, S
 
     //bishopMoves |= bishopMoves & ~this->RANK_8 & ~(this->PLAYER_PIECES);
 
+    for (auto &move: bishopMoves)
+        move &= ~(1ULL << index);
+
     return bishopMoves;
 }
 
@@ -264,6 +289,9 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
             break;
     }
 
+    for (auto &move: rookMoves)
+        move &= ~(1ULL << index);
+
     return rookMoves;
 }
 
@@ -278,6 +306,9 @@ std::vector<uint64_t> Moves::getQueenMoves(int const index, Bitboard *&board, Sq
 
     queenMoves.insert(queenMoves.end(), std::make_move_iterator(bishopMoves.begin()), std::make_move_iterator(bishopMoves.end()));
     queenMoves.insert(queenMoves.end(), std::make_move_iterator(rookMoves.begin()), std::make_move_iterator(rookMoves.end()));
+
+    for (auto &move: queenMoves)
+        move &= ~(1ULL << index);
 
     return queenMoves;
 }
@@ -481,6 +512,9 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
     mask = (BITBOARD << 1) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_A;
     if (!checkKingInCheck(allPieces, mask))
         kingMoves.push_back(mask);
+
+    for (auto &move: kingMoves)
+        move &= ~(1ULL << index);
 
     return kingMoves;
 }

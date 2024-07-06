@@ -36,7 +36,7 @@ class Moves {
         Moves();
         ~Moves();
 
-        std::vector<uint64_t> getPawnMoves(int, Bitboard *&, Square *&) const;
+        std::vector<uint64_t> getPawnMoves(int, Bitboard *&, Square *&, int enPeasantPos = -1) const;
         std::vector<uint64_t> getKnightMoves(int, Bitboard *&, Square *&) const;
         std::vector<uint64_t> getBishopMoves(int, Bitboard *&, Square *&) const;
         std::vector<uint64_t> getRookMoves(int, Bitboard *&, Square *&) const;

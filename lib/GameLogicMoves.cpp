@@ -59,7 +59,7 @@ std::vector<uint64_t> GameLogic::generateMoves(int const index) {
     this->possibleMoves->setBitboard(this->bitBoards[pieceVal]->useBitboard()); // Set starting Bitboard
 
     std::unordered_map<float, std::function<std::vector<uint64_t>()>> map = {
-        {1.0f, [this, &squares, index]() {return this->moves.getPawnMoves(index, this->possibleMoves, squares);}},
+        {1.0f, [this, &squares, index]() {return this->moves.getPawnMoves(index, this->possibleMoves, squares, this->enPeasontPos);}},
         {3.1f, [this, &squares, index]() {return this->moves.getKnightMoves(index, this->possibleMoves, squares);}},
         {3.2f, [this, &squares, index]() {return this->moves.getBishopMoves(index, this->possibleMoves, squares);}},
         {5.0f, [this, &squares, index]() {return this->moves.getRookMoves(index, this->possibleMoves, squares);}},
@@ -178,7 +178,7 @@ void GameLogic::getPossibleMovesInCheck() {
                     // If Attacking Piece is a Sliding Piece
                     // Check if Any Pieces can Capture
                     if ((generalCond || pawnCond) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
-                        this->validSquares->setBitboard(valid | (1ULL << i));
+                        this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
                         this->playerMovesInCheck.insert((1ULL << attackingIndices[0]));
                     }
                     else
@@ -188,20 +188,25 @@ void GameLogic::getPossibleMovesInCheck() {
                     // Check if Any Pieces can Block
                     // attackChecks<BitBoard, inCheck?>
                     for (auto &move: this->attackChecks) {
-                        if (move.second && (move.first & this->possibleMoves->useBitboard()) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
-                            this->validSquares->setBitboard(valid | (1ULL << i));
+                        std::cout << move.second << std::endl;
+                        if (move.second && (pawnP == nullptr) && (move.first & this->possibleMoves->useBitboard()) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
+                            this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
                             this->playerMovesInCheck.insert(this->possibleMoves->useBitboard() & move.first);
+                        }
+                        else if (move.second && (pawnP != nullptr) && (move.first & allMoves[0]) && (atkKnight == nullptr) && (atkPawn == nullptr)) {
+                            this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
+                            this->playerMovesInCheck.insert(allMoves[0] & move.first);
                         }
                     }
 
                     // If Attacking Piece is a Knight or Pawn
                     // Must Capture
                     if ((generalCond || pawnCond) && ((atkKnight != nullptr) || (atkPawn != nullptr))) {
-                        this->validSquares->setBitboard(valid | (1ULL << i));
+                        this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << i));
                         this->playerMovesInCheck.insert((1ULL << attackingIndices[0]));
                     }
                     else if ((atkKnight != nullptr) || (atkPawn != nullptr))
-                        this->validSquares->setBitboard(valid & ~(1ULL << i));
+                        this->validSquares->setBitboard(this->validSquares->useBitboard() & ~(1ULL << i));
                 }
                 pieceBoard >>= 1; // Move one bit
             }
@@ -210,14 +215,20 @@ void GameLogic::getPossibleMovesInCheck() {
 
     this->validSquares->setBitboard(this->validSquares->useBitboard() | (1ULL << kingInCheckInd)); // Allows King to Move
 
+    this->validSquares->setBitboard(this->validSquares->useBitboard() & ~(1ULL << attackingIndices[0]));
+
     this->updateValidSquare();
 }
 
 void GameLogic::capturePiece(int const index) {
     Square *squares = this->curBoard->useBoard();
 
+    std::cout << "Index: " << index << std::endl;
+
     uint64_t const BITBOARD = ~(1ULL << index);
 
     this->bitBoards[squares[index].usePiece()]->setBitboard(this->bitBoards[squares[index].usePiece()]->useBitboard() & BITBOARD);
+
+    this->interface->incrementScore(squares[index].usePiece());
 }
 
