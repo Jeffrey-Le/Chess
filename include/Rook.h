@@ -5,9 +5,11 @@
 #ifndef ROOK_H
 #define ROOK_H
 
-#include "Piece.h"
+#include "Pawn.h"
 
-class Rook : public Piece {
+class Rook : public Pawn {
+    private:
+        bool isCastle = false;
     public:
         Rook();
         explicit Rook(char);

@@ -21,6 +21,14 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
 
     if (clickedSquare->checkValid()) {
         if (clickedSquare->checkEmpty() && trackedSquare != nullptr) {
+            int const sum = (clickedSquare->kingSide()) ? 1 : -2;
+
+            auto rookNewSquare = (clickedSquare->kingSide()) ? (clickedSquare - 1) : (clickedSquare + 1);
+            auto rookOldSquare = clickedSquare + sum;
+
+            Rook* rook = dynamic_cast<Rook*>(rookOldSquare->useOccupiedPiece());
+            King* king = dynamic_cast<King*>(trackedSquare->useOccupiedPiece());
+
             int const diffIndex = trackedSquare - clickedSquare;
             int const temp = index + diffIndex;
 
@@ -28,6 +36,26 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
 
             if (kingInCheck != nullptr && kingInCheck->isCheck())
                 kingInCheck->setCheck(false);
+
+            std::cout << "clickedSquare sum: " << sum << "\n";
+
+            if (rook != nullptr && rook->checkFirstMove() && clickedSquare->useCastle())
+            {
+                int rookIndex = 0; // find index
+
+                int const rookDiffIndex = rookOldSquare - rookNewSquare;
+                int const rookTemp = rookIndex + diffIndex;
+
+                swapSquareClick(rookNewSquare, rookOldSquare);
+                rook->setFirstMove();
+
+
+
+                // TODO: Add a this->logic->updateMoves(RookOldIndex, RookNewIndex);
+            }
+
+            if (king != nullptr && king->checkFirstMove())
+                king->setFirstMove();
 
             this->logic->updateMoves(index, temp);
 

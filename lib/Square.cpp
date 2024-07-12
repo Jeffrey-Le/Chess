@@ -58,6 +58,10 @@ void Square::setValidMove(bool const val) {
     this->isValidMove = val;
 }
 
+void Square::setCastle(bool const val) {
+    this->isCastle = val;
+}
+
 sf::Vector2f Square::usePos() const {
     return this->squareSpace->getPosition();
 }
@@ -68,6 +72,10 @@ sf::RectangleShape Square::useSquare() const {
 
 float Square::usePiece() const {
     return this->piece;
+}
+
+bool Square::useCastle() const {
+    return this->isCastle;
 }
 
 bool Square::checkValid() const {
@@ -99,6 +107,14 @@ Piece *Square::useOccupiedPiece() const {
         return nullptr;
 
     return this->occupiedPiece;
+}
+
+void Square::swapCastleSide() {
+    this->kingCastle = !this->kingCastle;
+}
+
+bool Square::kingSide() const {
+    return this->kingCastle;
 }
 
 void Square::resetState() {

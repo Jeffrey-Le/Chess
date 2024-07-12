@@ -20,6 +20,8 @@ class Square {
 
         bool isValidMove = false;
         bool isEmpty = true;
+        bool isCastle = false;
+        bool kingCastle = false; // False = Queen Side, True = King Side
     public:
         Square();
         explicit Square(float);
@@ -36,11 +38,15 @@ class Square {
         void setColor(sf::Color);
         void setPos(float, float) const;
         void setValidMove(bool);
+        void setCastle(bool);
+        void swapCastleSide();
 
         sf::Vector2f usePos() const;
         sf::RectangleShape useSquare() const;
         float usePiece() const;
         Piece *useOccupiedPiece() const;
+        bool useCastle() const;
+        bool kingSide() const;
 
         bool checkValid() const;
         bool checkEmpty() const;

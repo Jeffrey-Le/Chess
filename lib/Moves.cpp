@@ -3,6 +3,8 @@
 //
 
 #include "../include/Moves.h"
+#include "../include/Rook.h"
+#include "../include/King.h"
 
 Moves::Moves() {
 
@@ -317,6 +319,7 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
     // std::cout << "In King Moves" << std::endl;
 
     // TODO: FIND A WAY TO MAKE SURE KING IS UNABLE TO MOVE SPACES INTO CHECK
+    // TODO: MAKE CASTLING
 
     // ALl Files and Ranks
     int file = index % 8;
@@ -515,6 +518,54 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
 
     for (auto &move: kingMoves)
         move &= ~(1ULL << index);
+
+    // Castling
+
+    // Get Both Side Rooks
+
+    uint64_t castling = 0ULL;
+
+    // Guaranteed to be a Rook Derived Classes
+    std::unordered_map<int, Rook*> rooks;
+    auto king = dynamic_cast<King*>(squares[index].useOccupiedPiece());
+
+    if (!king->checkWhite()) {
+        rooks[0] = dynamic_cast<Rook*>(squares[0].useOccupiedPiece());
+        rooks[7] = dynamic_cast<Rook*>(squares[7].useOccupiedPiece());
+    }
+    else {
+        rooks[56] = dynamic_cast<Rook*>(squares[56].useOccupiedPiece());
+        rooks[63] = dynamic_cast<Rook*>(squares[63].useOccupiedPiece());
+    }
+
+
+    for (auto &rook: rooks)
+    {
+        if (rook.second != nullptr && rook.second->checkFirstMove() && king->checkFirstMove())
+        {
+            // King Side
+            uint64_t kingSide = (rook.second->checkWhite()) ? 6917529027641081856ULL : 96ULL;
+
+            uint64_t castleCond = ((1ULL << rook.first) & this->PLAYER_PIECES & this->KING_SIDE) && ((kingSide & this->EMPTY) == kingSide) && (!checkKingInCheck(allPieces, (kingSide & this->EMPTY)));
+
+            if (castleCond) {
+                castling |= (1ULL << (rook.first - 1));
+                squares[rook.first-1].setCastle(true);
+                squares[rook.first-1].swapCastleSide();
+            }
+
+            // Queen Side
+            uint64_t queenSide = (rook.second->checkWhite()) ? 1008806316530991104ULL : 14ULL;
+
+            castleCond = ((1ULL << rook.first) & this->PLAYER_PIECES & this->QUEEN_SIDE) && ((queenSide & this->EMPTY) == queenSide) && (!checkKingInCheck(allPieces, (queenSide & this->EMPTY)));
+            if (castleCond) {
+                castling |= (1ULL << (rook.first + 2));
+                squares[rook.first+2].setCastle(true);
+            }
+        }
+    }
+
+    kingMoves.push_back(castling);
 
     return kingMoves;
 }
