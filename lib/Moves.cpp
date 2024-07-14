@@ -111,8 +111,6 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     pawnBasicMoves &= ~(1ULL << index);
     pawnCaptures &= ~(1ULL << index);
 
-    std::cout << "Pawn CAptures: " << pawnCaptures << std::endl;
-
     return std::vector<uint64_t>({pawnBasicMoves, pawnCaptures});
 }
 
@@ -250,18 +248,18 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
 
     int curFile = index % 8;
 
-    for (int  i = 1; i < 7; i++) {
+    for (int  i = 1; i < 8; i++) {
         if ((this->PLAYER_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
             break;
 
 
         rookMoves[0] |= (BITBOARD >> (8 * i));
 
-        if ((this->OPPOSING_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
-            break;
+        // if ((this->OPPOSING_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
+        //     break;
     }
 
-    for (int  i = 1; i < 7; i++) {
+    for (int  i = 1; i < 8; i++) {
         if ((this->PLAYER_PIECES & (BITBOARD << (8 * i))) != 0ULL)
             break;
 
@@ -275,7 +273,7 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
         if (((this->PLAYER_PIECES & (BITBOARD >> i)) != 0ULL))
             break;
 
-        rookMoves[2] |= (BITBOARD >> i) & ~this->FILE_H;
+        rookMoves[2] |= (BITBOARD >> i);
 
         if (((this->OPPOSING_PIECES & (BITBOARD >> i)) != 0ULL))
             break;
@@ -285,7 +283,7 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
         if (((this->PLAYER_PIECES & (BITBOARD << i)) != 0ULL))
             break;
 
-        rookMoves[3] |= (BITBOARD << i) & ~this->FILE_A;
+        rookMoves[3] |= (BITBOARD << i);
 
         if (((this->OPPOSING_PIECES & (BITBOARD << i)) != 0ULL))
             break;
@@ -383,6 +381,7 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
     uint64_t bishopMoves = 0ULL;
     uint64_t rookMoves = 0ULL;
     uint64_t queenMoves = 0ULL;
+    uint64_t oppKingMoves = 0ULL;
 
     // Loop Through Opposing Player Board
     uint64_t opposingBoard = this->PLAYER_PIECES;
@@ -472,52 +471,33 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
             queenMoves &= ~(1ULL << curPieceIndex);
         }
 
+        // Opposing King
+        pieceBoard = (bitBoards[-0.1f * multiplier]->useBitboard() >> curPieceIndex);
+
+        if ((opposingBoard & pieceBoard) & 1ULL) {
+            std::vector<uint64_t> oppAllKingMoves = this->generateKingMoves(curPieceIndex, bitBoards[-0.1f * multiplier]);
+
+            for (auto &move: oppAllKingMoves)
+                oppKingMoves |= move;
+        }
+
         opposingBoard >>= 1;
         curPieceIndex++;
     }
 
-    std::vector<uint64_t> allPieces = {pawnMoves, knightMoves, bishopMoves, rookMoves, queenMoves};
+    std::vector<uint64_t> allPieces = {pawnMoves, knightMoves, bishopMoves, rookMoves, queenMoves, oppKingMoves};
 
     // Swap Back
     tempPlayerP = this->PLAYER_PIECES;
     this->setPlayerP(this->OPPOSING_PIECES);
     this->setOpposingP(tempPlayerP);
 
+    std::vector<uint64_t> tempKingMoves = generateKingMoves(index, board);
 
-    // Directions: NW, N, NE, W, E, SW, S, SE
-
-    uint64_t mask = 0ULL;
-
-    // North East NE (Top-Left)
-    // North West NW (Top-Right)
-    // North N (Top-Mid)
-    for (int i = 7; i < 10; i++) {
-        mask = (BITBOARD >> i) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_1;
-        if (!checkKingInCheck(allPieces, mask))
-            kingMoves.push_back(mask);
+    for (auto &move: tempKingMoves) {
+        if (!checkKingInCheck(allPieces, move))
+            kingMoves.push_back(move);
     }
-
-    // South East SE (Bottom-Left)
-    // South West SW (Bottom-Right)
-    // South S (Bottom-Mid)
-    for (int i = 7; i < 10; i++) {
-        mask = (BITBOARD << i) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_8;
-        if (!checkKingInCheck(allPieces, mask))
-            kingMoves.push_back(mask);
-    }
-
-    // West W (Mid-Left)
-    mask = (BITBOARD >> 1) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_H;
-    if (!checkKingInCheck(allPieces, mask))
-        kingMoves.push_back(mask);
-
-    // East E (Mid-Right)
-    mask = (BITBOARD << 1) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_A;
-    if (!checkKingInCheck(allPieces, mask))
-        kingMoves.push_back(mask);
-
-    for (auto &move: kingMoves)
-        move &= ~(1ULL << index);
 
     // Castling
 
@@ -569,6 +549,70 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
 
     return kingMoves;
 }
+
+std::vector<uint64_t> Moves::generateKingMoves(int const index, Bitboard *&board) const {
+    std::vector<uint64_t> kingMoves;
+
+    uint64_t const BITBOARD = board->useBitboard() & (1ULL << index);
+
+    // Directions: NW, N, NE, W, E, SW, S, SE
+
+    uint64_t mask = 0ULL;
+
+    // North East NE (Top-Left)
+    // North West NW (Top-Right)
+    // North N (Top-Mid)
+    for (int i = 7; i < 10; i++) {
+        mask = (BITBOARD >> i) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_1;
+
+        switch (i) {
+            case 7:
+                mask &= ~this->FILE_H;
+            case 9:
+                mask &= ~this->FILE_A;
+            default:
+                break;
+        }
+
+        kingMoves.push_back(mask);
+    }
+
+    // South East SE (Bottom-Left)
+    // South West SW (Bottom-Right)
+    // South S (Bottom-Mid)
+    for (int i = 7; i < 10; i++) {
+        mask = (BITBOARD << i) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->RANK_8;
+
+        switch (i) {
+            case 7:
+                mask &= ~this->FILE_H;
+            case 9:
+                mask &= ~this->FILE_A;
+            default:
+                break;
+        }
+
+        kingMoves.push_back(mask);
+    }
+
+    // West W (Mid-Left)
+    mask = (BITBOARD >> 1) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_H;
+    kingMoves.push_back(mask);
+
+    // East E (Mid-Right)
+    mask = (BITBOARD << 1) & ~this->PLAYER_PIECES & (this->OPPOSING_PIECES | this->EMPTY) & ~this->FILE_A;
+    kingMoves.push_back(mask);
+
+    for (auto &move: kingMoves)
+        move &= ~(1ULL << index);
+
+
+    return kingMoves;
+}
+
+
+
+
 
 bool Moves::checkKingInCheck(std::vector<uint64_t> const &otherPieces, uint64_t mask) {
     if (std::any_of(otherPieces.begin(), otherPieces.end(), [&mask](uint64_t piece) {return (piece & mask) != 0ULL;}))

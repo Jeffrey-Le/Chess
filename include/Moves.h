@@ -42,6 +42,7 @@ class Moves {
         std::vector<uint64_t> getRookMoves(int, Bitboard *&, Square *&) const;
         std::vector<uint64_t> getQueenMoves(int, Bitboard *&, Square *&) const;
         std::vector<uint64_t> getKingMoves(int, std::unordered_map<float, Bitboard*>, Bitboard *&, Square *&);
+        std::vector<uint64_t> generateKingMoves(int, Bitboard*&) const;
 
         // Helper Functions
         void blackOrWhite(bool , uint64_t, uint64_t &, int) const;

@@ -6,6 +6,7 @@
 #define GAMEINTERFACE_H
 
 #include <iostream>
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 
 class GameInterface {

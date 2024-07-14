@@ -142,6 +142,7 @@ void GameLogic::getPossibleMovesInCheck() {
         this->kingInCheck = false;
         this->attackingIndices.clear();
         this->attackChecks.clear();
+        this->playerMovesInCheck.clear();
         return;
     }
 

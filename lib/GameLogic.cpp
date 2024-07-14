@@ -204,11 +204,10 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     uint64_t const newPieceBoardMask = bitwiseOr(this->bitBoards[pieceVal]->useBitboard(), newSpaceMask);
     uint64_t const newPieceBoard = bitwiseAnd(newPieceBoardMask, oldSpaceMask);
 
+
     this->bitBoards[pieceVal]->setBitboard(newPieceBoard);
 
     // Check En Pesant
-
-
     this->lookForEnPeasant(clickedIndex, trackedIndex);
 
     if (this->enPeasant)

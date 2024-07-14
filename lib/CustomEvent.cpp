@@ -21,38 +21,51 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
 
     if (clickedSquare->checkValid()) {
         if (clickedSquare->checkEmpty() && trackedSquare != nullptr) {
-            int const sum = (clickedSquare->kingSide()) ? 1 : -2;
+            int const sum = (clickedSquare->kingSide() && clickedSquare->useCastle()) ? 1 : -2;
 
-            auto rookNewSquare = (clickedSquare->kingSide()) ? (clickedSquare - 1) : (clickedSquare + 1);
+            auto rookNewSquare = (clickedSquare->kingSide() && clickedSquare->useCastle()) ? (clickedSquare - 1) : (clickedSquare + 1);
             auto rookOldSquare = clickedSquare + sum;
 
-            Rook* rook = dynamic_cast<Rook*>(rookOldSquare->useOccupiedPiece());
-            King* king = dynamic_cast<King*>(trackedSquare->useOccupiedPiece());
+            Rook* rook = (clickedSquare->useCastle()) ? dynamic_cast<Rook*>(rookOldSquare->useOccupiedPiece()) : nullptr;
+            King* king = (clickedSquare->useCastle()) ? dynamic_cast<King*>(trackedSquare->useOccupiedPiece()) : nullptr;
 
             int const diffIndex = trackedSquare - clickedSquare;
             int const temp = index + diffIndex;
 
+            if (rook != nullptr && rook->checkFirstMove() && clickedSquare->useCastle())
+            {
+                int rookIndex; // find index
+
+                if (rook->checkWhite()) {
+                    if (clickedSquare->kingSide())
+                        rookIndex = 61;
+                    else
+                        rookIndex = 59;
+                }
+                else {
+                    if (clickedSquare->kingSide())
+                        rookIndex = 5;
+                    else
+                        rookIndex = 3;
+                }
+
+                int const rookDiffIndex = rookOldSquare - rookNewSquare;
+                int const rookTemp = rookIndex + rookDiffIndex;
+
+                rook->setFirstMove();
+                swapSquareClick(rookNewSquare, rookOldSquare);
+
+                this->logic->updateMoves(rookIndex, rookTemp);
+            }
+
+            std::cout << "Before SwapSquareClick: " << clickedSquare << "\n" << trackedSquare << "\n";
+
             swapSquareClick(clickedSquare, trackedSquare);
+
+            std::cout << "After SwapSquareClick\n";
 
             if (kingInCheck != nullptr && kingInCheck->isCheck())
                 kingInCheck->setCheck(false);
-
-            std::cout << "clickedSquare sum: " << sum << "\n";
-
-            if (rook != nullptr && rook->checkFirstMove() && clickedSquare->useCastle())
-            {
-                int rookIndex = 0; // find index
-
-                int const rookDiffIndex = rookOldSquare - rookNewSquare;
-                int const rookTemp = rookIndex + diffIndex;
-
-                swapSquareClick(rookNewSquare, rookOldSquare);
-                rook->setFirstMove();
-
-
-
-                // TODO: Add a this->logic->updateMoves(RookOldIndex, RookNewIndex);
-            }
 
             if (king != nullptr && king->checkFirstMove())
                 king->setFirstMove();
