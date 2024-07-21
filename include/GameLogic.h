@@ -69,6 +69,7 @@ class GameLogic {
 
         bool lookForCheckmate();
         void lookForEnPeasant(int, int);
+        void lookForPromotion(int);
 
         // Helpers
         std::vector<uint64_t> generateMoves(int);

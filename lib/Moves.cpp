@@ -46,7 +46,7 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
 
     // Check Capture Right
     uint64_t pawnBasicMoves = 0ULL;
-    uint64_t pawnCaptures = ~this->FILE_H;
+    uint64_t pawnCaptures = ~this->FILE_A & this->OPPOSING_PIECES;
 
     if (isNeg)
         pawnCaptures &= (BITBOARD << 7) & ~this->RANK_1;
@@ -54,7 +54,7 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
         pawnCaptures &= (BITBOARD >> 7) & ~this->RANK_8;
 
     // Check Capture Left
-    mask = ~this->FILE_H;
+    mask = ~this->FILE_H & this->OPPOSING_PIECES;
 
     blackOrWhite(isNeg, BITBOARD, mask, 9);
 
@@ -81,30 +81,48 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     }
     else
         mask = 0ULL;
-
+\
     pawnBasicMoves |= mask;
 
 
     // -- Promotions --
 
     // Promotion while Capture Right
-    mask = ~this->FILE_A;
+    mask = ~this->FILE_A & this->OPPOSING_PIECES;
 
-    blackOrWhite(isNeg, BITBOARD, mask, 7);
+    if (isNeg)
+        mask &= (BITBOARD << 7) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 7) & this->RANK_8;
+
+    if (mask)
+        pawn->setPromotion(true);
 
     pawnCaptures |= mask;
 
     // Promotion while Capture Left
-    mask = ~this->FILE_A;
+    mask = ~this->FILE_H & this->OPPOSING_PIECES;
 
-    blackOrWhite(isNeg, BITBOARD, mask, 9);
+    if (isNeg)
+        mask &= (BITBOARD << 9) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 9) & this->RANK_8;
+
+    if (mask)
+        pawn->setPromotion(true);
 
     pawnCaptures |= mask;
 
     // Promotion Move 1 Square
-    mask |= this->EMPTY & ~this->FILE_H;
+    mask |= this->EMPTY;
 
-    blackOrWhite(isNeg, BITBOARD, mask, 8);
+    if (isNeg)
+        mask &= (BITBOARD << 8) & this->RANK_1;
+    else
+        mask &= (BITBOARD >> 8) & this->RANK_8;
+
+    if (mask)
+        pawn->setPromotion(true);
 
     pawnBasicMoves |= mask;
 
@@ -478,7 +496,7 @@ std::vector<uint64_t> Moves::getKingMoves(int const index, std::unordered_map<fl
             std::vector<uint64_t> oppAllKingMoves = this->generateKingMoves(curPieceIndex, bitBoards[-0.1f * multiplier]);
 
             for (auto &move: oppAllKingMoves)
-                oppKingMoves |= move;
+                oppKingMoves |= move | this->PLAYER_PIECES;
         }
 
         opposingBoard >>= 1;
@@ -567,9 +585,11 @@ std::vector<uint64_t> Moves::generateKingMoves(int const index, Bitboard *&board
 
         switch (i) {
             case 7:
-                mask &= ~this->FILE_H;
-            case 9:
                 mask &= ~this->FILE_A;
+                break;
+            case 9:
+                mask &= ~this->FILE_H;
+                break;
             default:
                 break;
         }
@@ -586,8 +606,10 @@ std::vector<uint64_t> Moves::generateKingMoves(int const index, Bitboard *&board
         switch (i) {
             case 7:
                 mask &= ~this->FILE_H;
+                break;
             case 9:
                 mask &= ~this->FILE_A;
+                break;
             default:
                 break;
         }

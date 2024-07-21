@@ -215,6 +215,8 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     else
         this->enPeasontPos = -1;
 
+    this->lookForPromotion(clickedIndex);
+
     // Checks the Future Possible Moves for the Current Piece to See if Move Made King in Check
     this->getPossibleMoves(clickedIndex);
 
@@ -419,6 +421,17 @@ void GameLogic::lookForEnPeasant(int clickedIndex, int trackedIndex) {
 
     if ((((1ULL << left) & opposingPawn->useBitboard()) != 0ULL) || (((1ULL << right) & opposingPawn->useBitboard()) != 0ULL))
         this->enPeasant = true;
+}
+
+void GameLogic::lookForPromotion(int const clickedIndex) {
+    auto const squares = this->curBoard->useBoard();
+
+    auto pawn = dynamic_cast<Pawn*>(squares[clickedIndex].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+
+    if (pawn->checkPromotion()) {
+        // Get Promotion UI
+        // Select Promotion
+    }
 }
 
 

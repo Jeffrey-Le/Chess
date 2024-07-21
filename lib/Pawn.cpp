@@ -58,6 +58,15 @@ bool Pawn::checkFirstMove() {
     return false;
 }
 
+bool Pawn::checkPromotion() {
+    return this->isPromoted;
+}
+
+
 void Pawn::setFirstMove() {
     this->firstMove = false;
+}
+
+void Pawn::setPromotion(bool val) {
+    this->isPromoted = val;
 }

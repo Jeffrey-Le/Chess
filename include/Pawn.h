@@ -10,14 +10,17 @@
 class Pawn : public Piece {
     private:
         bool firstMove = true;
+        bool isPromoted = false;
     public:
         Pawn();
         explicit Pawn(char);
         ~Pawn() override;
 
         bool checkFirstMove();
+        bool checkPromotion();
 
-    void setFirstMove();
+        void setFirstMove();
+        void setPromotion(bool);
 
 };
 
