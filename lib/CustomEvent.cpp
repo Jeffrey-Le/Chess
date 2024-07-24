@@ -130,9 +130,23 @@ void CustomEvent::swapSquareClick(Square *&clickedSquare, Square *& trackedSquar
     trackedSquare->setOccupiedPiece(new Piece());
 }
 
+void CustomEvent::promotionClick(Square *square) {
+    char color = (square->useOccupiedPiece()->checkWhite()) ? 'w' : 'b';
+
+    this->isPromoted[color] = false;
+}
+
+void CustomEvent::setPromotion(char const color, bool const val) {
+    this->isPromoted[color] = val;
+}
+
 
 sf::Event CustomEvent::useCustomEvent() const{
     return this->event;
+}
+
+std::unordered_map<char, bool> CustomEvent::usePromotion() const {
+    return this->isPromoted;
 }
 
 

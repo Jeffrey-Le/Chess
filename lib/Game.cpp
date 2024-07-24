@@ -4,6 +4,7 @@
 
 #include "../include/Game.h"
 #include "../include/CustomEvent.h"
+#include "../include/Promotion.h"
 
 Game::Game() {
     this->window.create(sf::VideoMode(960, 720), "SFML Application");
@@ -70,6 +71,16 @@ void Game::openGame() {
         this->window.draw(this->interface->useColorUI());
         this->window.draw(this->interface->useScoreUI());
 
+//        if (customEvent.usePromotion()) {
+//            auto *newPromotion = new Promotion();
+//
+//            logic->
+//
+//            newPromotion->drawPromotionUI();
+//
+//            this->window.draw();
+//        }
+
         this->window.display(); // Display
 
 
@@ -79,62 +90,97 @@ void Game::openGame() {
             if (event.type == sf::Event::Closed)
                 this->window.close();
 
+            if (mate) {
+                std::cout << "CHECKMATE GAME OVER" << std::endl;
+                this->window.close();
+            }
+
             bool stateEnd = false; // Track the end of a state (Move is Made)
 
-            if (!mate) {
-                for (int i = 0; i < 64; i++) {
-                    // Click Logic
-                    if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
-                    {
-                        if (event.mouseButton.button == sf::Mouse::Left) {
-                            std::unordered_map<char, int> kingPositions = logic->findKingPositions();
+            Promotion *newPromotion = nullptr;
 
-                            King* wKing = dynamic_cast<King*>(squares[kingPositions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
-                            King* bKing = dynamic_cast<King*>(squares[kingPositions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+            char color;
 
-                            std::unordered_map<char, King*> kingPieces = {{'w', wKing}, {'b', bKing}};
+            for (int i = 0; i < 64; i++) {
+                // Click Logic
+                if (event.type == sf::Event::MouseButtonPressed && squares[i].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y))
+                {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        std::unordered_map<char, int> kingPositions = logic->findKingPositions();
 
-                            stateEnd = customEvent.squareClickLogic(kingPieces, &squares[i], trackedSquare, i);
-                        }
+                        King* wKing = dynamic_cast<King*>(squares[kingPositions['w']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
+                        King* bKing = dynamic_cast<King*>(squares[kingPositions['b']].useOccupiedPiece()); // Guaranteed to be a King Derived Class
 
-                        if (event.mouseButton.button == sf::Mouse::Right) {
-                            std::cout << "Right Click" << std::endl;
+                        std::unordered_map<char, King*> kingPieces = {{'w', wKing}, {'b', bKing}};
 
-                            squares[i].changeColor(sf::Color(50, 255, 50));
-                        }
-                    }
-                }
+                        stateEnd = customEvent.squareClickLogic(kingPieces, &squares[i], trackedSquare, i);
 
-                if (stateEnd) {
-                    // Reset State
-                    for (int i = 0; i < 64; i++) {
-                        squares[i].resetState();
+                        color = (squares[i].useOccupiedPiece()->checkWhite()) ? 'w' : 'b';
+
+                        customEvent.setPromotion(color, logic->lookForPromotion(i));
                     }
 
-                    this->board->setSquares(squares); // Update Board
+                    if (event.mouseButton.button == sf::Mouse::Right) {
+                        std::cout << "Right Click" << std::endl;
 
-                    std::cout << "Updating Board" << std::endl;
-
-                    logic->standbyUpdate();
-
-                    logic->getPossibleMovesInCheck(); // Looks for Check
-
-                    logic->updateBoard(this->board); // Update Logic
-
-                    mate = logic->lookForCheckmate();
-
-                    // Update Interface
-                    this->interface->setScoreUI();
-                    this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
-                    this->interface->inverseWhite();
+                        squares[i].changeColor(sf::Color(50, 255, 50));
+                    }
                 }
             }
 
-        }
+            // TODO: HUGE BUG; WORK ON MAKING PROMOTION UI APPEAR ON PAWN CLICK
+            // PAWN CLICK IS CRASHING WHEN ONE SQUARE AWAY FROM PROMOTION
 
-        if (mate) {
-            std::cout << "CHECKMATE GAME OVER" << std::endl;
-            this->window.close();
+            if (customEvent.usePromotion()[color])
+            {
+                newPromotion = new Promotion();
+
+                int const promotionInd = logic->usePromotionSquare();
+
+                newPromotion->drawPromotionUI(squares[promotionInd].useSquare().getPosition());
+
+                this->window.draw(newPromotion->usePromUI());
+
+                this->window.display();
+            }
+
+            // THIS INFINITELY LOOPS
+//            while (customEvent.usePromotion()[color]) {
+//                int const promotionInd = logic->usePromotionSquare();
+//
+//                if (event.type == sf::Event::MouseButtonPressed && squares[promotionInd].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y)) {
+//                    if (event.mouseButton.button == sf::Mouse::Left) {
+//                        customEvent.promotionClick(&squares[promotionInd]);
+//                        std::cout << "Setting to false\n";
+//                    }
+//                    else
+//                        std::cout << "Still True\n";
+//                }
+//            }
+
+            if (stateEnd && !customEvent.usePromotion()[color]) {
+                // Reset State
+                for (int i = 0; i < 64; i++) {
+                    squares[i].resetState();
+                }
+
+                this->board->setSquares(squares); // Update Board
+
+                std::cout << "Updating Board" << std::endl;
+
+                logic->standbyUpdate();
+
+                logic->getPossibleMovesInCheck(); // Looks for Check
+
+                logic->updateBoard(this->board); // Update Logic
+
+                mate = logic->lookForCheckmate();
+
+                // Update Interface
+                this->interface->setScoreUI();
+                this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
+                this->interface->inverseWhite();
+            }
         }
     }
 

@@ -69,7 +69,7 @@ class GameLogic {
 
         bool lookForCheckmate();
         void lookForEnPeasant(int, int);
-        void lookForPromotion(int);
+        bool lookForPromotion(int const);
 
         // Helpers
         std::vector<uint64_t> generateMoves(int);
@@ -91,6 +91,7 @@ class GameLogic {
 
         // Use Functions
         bool usePlayerTurn() const;
+        int usePromotionSquare() const;
 
         // Bitwise Functions
         static uint64_t bitwiseAnd(Bitboard *&, Bitboard *&);

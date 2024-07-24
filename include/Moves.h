@@ -56,6 +56,7 @@ class Moves {
 
         // Use Functions
         uint64_t useOpposingP() const;
+        int usePromotionInd(Square *) const;
 };
 
 #endif //MOVES_H

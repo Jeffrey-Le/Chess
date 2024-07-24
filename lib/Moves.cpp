@@ -660,4 +660,44 @@ uint64_t Moves::useOpposingP() const {
     return this->OPPOSING_PIECES;
 }
 
+int Moves::usePromotionInd(Square *squares) const {
+    uint64_t rank8 = this->RANK_8; // white
+    uint64_t rank1 = this->RANK_1; // black
+
+    int curInd = 0;
+
+    while (curInd < 8)
+    {
+        uint64_t const curIndBoard = (1ULL << curInd);
+
+        if ((rank8 & curIndBoard) == 1ULL)
+        {
+            Pawn *piece = dynamic_cast<Pawn*>(squares[curInd].useOccupiedPiece());
+
+            if (piece != nullptr)
+                return curInd;
+        }
+
+        curInd++;
+    }
+
+    curInd = 56;
+
+    while (curInd < 64)
+    {
+        uint64_t const curIndBoard = (1ULL << curInd);
+
+        if ((rank1 & curIndBoard) == 1ULL)
+        {
+            Pawn *piece = dynamic_cast<Pawn*>(squares[curInd].useOccupiedPiece());
+
+            if (piece != nullptr)
+                return curInd;
+        }
+
+        curInd++;
+    }
+
+    return -1;
+}
 
