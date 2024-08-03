@@ -21,6 +21,21 @@ void Moves::blackOrWhite(bool isNeg, uint64_t const BITBOARD, uint64_t &mask, in
         mask &= (BITBOARD >> space) & ~this->RANK_8;
 }
 
+void Moves::leftOrRight(bool isNeg, uint64_t &mask, int const space) const {
+    if (isNeg) {
+        if (space == 9)
+            mask &= ~this->FILE_A;
+        else
+            mask &= ~this->FILE_H;
+    }
+    else {
+        if (space == 9)
+            mask &= ~this->FILE_H;
+        else
+            mask &= ~this->FILE_A;
+    }
+}
+
 
 std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Square *&squares, int enPeasantPos) const {
     // std::cout << "In Pawn Moves" << std::endl;
@@ -46,17 +61,20 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
 
     // Check Capture Right
     uint64_t pawnBasicMoves = 0ULL;
-    uint64_t pawnCaptures = ~this->FILE_A & this->OPPOSING_PIECES;
+    uint64_t pawnCaptures = this->OPPOSING_PIECES;
 
     if (isNeg)
         pawnCaptures &= (BITBOARD << 7) & ~this->RANK_1;
     else
         pawnCaptures &= (BITBOARD >> 7) & ~this->RANK_8;
 
+    leftOrRight(isNeg, pawnCaptures, 7);
+
     // Check Capture Left
-    mask = ~this->FILE_H & this->OPPOSING_PIECES;
+    mask = this->OPPOSING_PIECES;
 
     blackOrWhite(isNeg, BITBOARD, mask, 9);
+    leftOrRight(isNeg, mask, 9);
 
     pawnCaptures |= mask;
 
@@ -88,28 +106,32 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     // -- Promotions --
 
     // Promotion while Capture Right
-    mask = ~this->FILE_A & this->OPPOSING_PIECES;
+    mask = this->OPPOSING_PIECES;
 
     if (isNeg)
         mask &= (BITBOARD << 7) & this->RANK_1;
     else
         mask &= (BITBOARD >> 7) & this->RANK_8;
 
-    if (mask)
-        pawn->setPromotion(true);
+    leftOrRight(isNeg, mask, 7);
+
+    // if (mask)
+    //     pawn->setPromotion(true);
 
     pawnCaptures |= mask;
 
     // Promotion while Capture Left
-    mask = ~this->FILE_H & this->OPPOSING_PIECES;
+    mask = this->OPPOSING_PIECES;
 
     if (isNeg)
         mask &= (BITBOARD << 9) & this->RANK_1;
     else
         mask &= (BITBOARD >> 9) & this->RANK_8;
 
-    if (mask)
-        pawn->setPromotion(true);
+    leftOrRight(isNeg, mask, 9);
+
+    // if (mask)
+    //     pawn->setPromotion(true);
 
     pawnCaptures |= mask;
 
@@ -121,8 +143,8 @@ std::vector<uint64_t> Moves::getPawnMoves(int const index, Bitboard *&board, Squ
     else
         mask &= (BITBOARD >> 8) & this->RANK_8;
 
-    if (mask)
-        pawn->setPromotion(true);
+    // if (mask)
+    //     pawn->setPromotion(true);
 
     pawnBasicMoves |= mask;
 
@@ -273,8 +295,8 @@ std::vector<uint64_t> Moves::getRookMoves(int const index, Bitboard *&board, Squ
 
         rookMoves[0] |= (BITBOARD >> (8 * i));
 
-        // if ((this->OPPOSING_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
-        //     break;
+        if ((this->OPPOSING_PIECES & (BITBOARD >> (8 * i))) != 0ULL)
+            break;
     }
 
     for (int  i = 1; i < 8; i++) {
@@ -642,6 +664,20 @@ bool Moves::checkKingInCheck(std::vector<uint64_t> const &otherPieces, uint64_t 
 
     return false;
 }
+
+void Moves::checkPawnPromotion(Square *& squares,int const clickedIndex) const {
+    Pawn* pawn = dynamic_cast<Pawn*>(squares[clickedIndex].useOccupiedPiece()); // Guaranteed to be a Pawn Derived Class
+
+    uint64_t pawnBit = (1ULL << clickedIndex);
+
+    uint64_t const RANK_1_8 = this->RANK_1 | this->RANK_8;
+
+    if (pawn != nullptr && fabsf(pawn->useVal()) == 1.0f && ((pawnBit & RANK_1_8) != 0ULL)) {
+        std::cout << "Setting Promotion to True \n";
+        pawn->setPromotion(true);
+    }
+}
+
 
 
 void Moves::setPlayerP(uint64_t const board) {

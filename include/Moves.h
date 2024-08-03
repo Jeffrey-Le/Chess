@@ -46,7 +46,9 @@ class Moves {
 
         // Helper Functions
         void blackOrWhite(bool , uint64_t, uint64_t &, int) const;
+        void leftOrRight(bool, uint64_t &, int const) const;
         static bool checkKingInCheck(std::vector<uint64_t> const&, uint64_t);
+        void checkPawnPromotion(Square *&, int const) const;
 
 
         // Setter Functions

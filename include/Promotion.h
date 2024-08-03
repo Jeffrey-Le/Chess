@@ -18,11 +18,13 @@ class Promotion {
         std::vector<Piece*> pieces;
     public:
         Promotion();
+        Promotion(char);
         ~Promotion();
 
         void drawPromotionUI(sf::Vector2f);
 
         sf::RectangleShape usePromUI();
+        std::vector<Piece*> usePromPieces();
 };
 
 #endif //CHESS_PROMOTION_H

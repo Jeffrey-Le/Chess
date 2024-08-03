@@ -46,6 +46,10 @@ void Game::openGame() {
 
     bool mate = false;
 
+    auto *newPromotion = new Promotion();
+
+    char color;
+
     while (this->window.isOpen())
     {
         sf::Event event = customEvent.useCustomEvent();
@@ -71,18 +75,22 @@ void Game::openGame() {
         this->window.draw(this->interface->useColorUI());
         this->window.draw(this->interface->useScoreUI());
 
-//        if (customEvent.usePromotion()) {
-//            auto *newPromotion = new Promotion();
-//
-//            logic->
-//
-//            newPromotion->drawPromotionUI();
-//
-//            this->window.draw();
-//        }
+        if (customEvent.usePromotion()[color]) {
+            //std::cout << "In Set Promotion Game" << std::endl;
+            newPromotion = new Promotion(color);
+
+            int const promotionInd = logic->usePromotionSquare();
+
+            newPromotion->drawPromotionUI(squares[promotionInd].useSquare().getPosition());
+
+            this->window.draw(newPromotion->usePromUI());
+
+            for (auto &promPiece: newPromotion->usePromPieces()) {
+                this->window.draw(promPiece->useSprite());
+            }
+        }
 
         this->window.display(); // Display
-
 
         // Event to check when user attempts to close window
         while (this->window.pollEvent(event))
@@ -97,9 +105,22 @@ void Game::openGame() {
 
             bool stateEnd = false; // Track the end of a state (Move is Made)
 
-            Promotion *newPromotion = nullptr;
+            // TODO: MAKE UI UPDATE STATEEND AND CHANGE PIECE AFTER CLICKING ON THE RIGHT PEICE
+            // TODO: MAKE UI SHOW OTHER PIECES TO CLICK
 
-            char color;
+            if (customEvent.usePromotion()[color])
+            {
+                if (event.type == sf::Event::MouseButtonPressed && newPromotion->usePromUI().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y)) {
+                    if (event.mouseButton.button == sf::Mouse::Left) {
+                        customEvent.setPromotion(color, false);
+
+                        std::cout << "Updating Board" << std::endl;
+                        this->endState(logic, mate);
+                    }
+                }
+
+                continue;
+            }
 
             for (int i = 0; i < 64; i++) {
                 // Click Logic
@@ -116,8 +137,6 @@ void Game::openGame() {
                         stateEnd = customEvent.squareClickLogic(kingPieces, &squares[i], trackedSquare, i);
 
                         color = (squares[i].useOccupiedPiece()->checkWhite()) ? 'w' : 'b';
-
-                        customEvent.setPromotion(color, logic->lookForPromotion(i));
                     }
 
                     if (event.mouseButton.button == sf::Mouse::Right) {
@@ -128,37 +147,8 @@ void Game::openGame() {
                 }
             }
 
-            // TODO: HUGE BUG; WORK ON MAKING PROMOTION UI APPEAR ON PAWN CLICK
-            // PAWN CLICK IS CRASHING WHEN ONE SQUARE AWAY FROM PROMOTION
+            if (stateEnd) {
 
-            if (customEvent.usePromotion()[color])
-            {
-                newPromotion = new Promotion();
-
-                int const promotionInd = logic->usePromotionSquare();
-
-                newPromotion->drawPromotionUI(squares[promotionInd].useSquare().getPosition());
-
-                this->window.draw(newPromotion->usePromUI());
-
-                this->window.display();
-            }
-
-            // THIS INFINITELY LOOPS
-//            while (customEvent.usePromotion()[color]) {
-//                int const promotionInd = logic->usePromotionSquare();
-//
-//                if (event.type == sf::Event::MouseButtonPressed && squares[promotionInd].useSquare().getGlobalBounds().contains(mouseCoords.x, mouseCoords.y)) {
-//                    if (event.mouseButton.button == sf::Mouse::Left) {
-//                        customEvent.promotionClick(&squares[promotionInd]);
-//                        std::cout << "Setting to false\n";
-//                    }
-//                    else
-//                        std::cout << "Still True\n";
-//                }
-//            }
-
-            if (stateEnd && !customEvent.usePromotion()[color]) {
                 // Reset State
                 for (int i = 0; i < 64; i++) {
                     squares[i].resetState();
@@ -168,21 +158,28 @@ void Game::openGame() {
 
                 std::cout << "Updating Board" << std::endl;
 
-                logic->standbyUpdate();
+                if(customEvent.usePromotion()[color])
+                    continue;
 
-                logic->getPossibleMovesInCheck(); // Looks for Check
-
-                logic->updateBoard(this->board); // Update Logic
-
-                mate = logic->lookForCheckmate();
-
-                // Update Interface
-                this->interface->setScoreUI();
-                this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
-                this->interface->inverseWhite();
+               this->endState(logic, mate);
             }
         }
     }
-
 }
+
+void Game::endState(GameLogic *& logic, bool &mate) {
+    logic->standbyUpdate();
+
+    logic->getPossibleMovesInCheck(); // Looks for Check
+
+    logic->updateBoard(this->board); // Update Logic
+
+    mate = logic->lookForCheckmate();
+
+    // Update Interface
+    this->interface->setScoreUI();
+    this->interface->setTurnCounter(this->interface->useTurnCounter() + 1);
+    this->interface->inverseWhite();
+}
+
 

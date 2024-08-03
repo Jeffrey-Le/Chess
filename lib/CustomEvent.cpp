@@ -14,10 +14,15 @@ CustomEvent::CustomEvent(GameLogic *&existingLogic) {
     this->logic = existingLogic;
 }
 
-bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, Square *clickedSquare, Square *&trackedSquare, int const index) const{
+bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, Square *clickedSquare, Square *&trackedSquare, int const index) {
     //std::cout << "Square is CLicked" << std::endl;
 
     King* kingInCheck = kingPieces['w']->isCheck() ? kingPieces['w'] : kingPieces['b'];
+
+    char color = 'j';
+
+    if (trackedSquare != nullptr)
+        color = (trackedSquare->useOccupiedPiece()->checkWhite()) ? 'w' : 'b';
 
     if (clickedSquare->checkValid()) {
         if (clickedSquare->checkEmpty() && trackedSquare != nullptr) {
@@ -72,6 +77,8 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
 
             this->logic->updateMoves(index, temp);
 
+            this->setPromotion(color, this->logic->lookForPromotion(index));
+
             return true;
         }
         else {
@@ -95,6 +102,9 @@ bool CustomEvent::squareClickLogic(std::unordered_map<char, King*> kingPieces, S
                     kingInCheck->setCheck(false);
 
                 this->logic->updateMoves(index, temp);
+
+                this->setPromotion(color, this->logic->lookForPromotion(index));
+
                 return true;
             }
         }

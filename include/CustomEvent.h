@@ -21,7 +21,7 @@ class CustomEvent {
         CustomEvent();
         explicit CustomEvent(GameLogic *&);
 
-        bool squareClickLogic(std::unordered_map<char, King*>, Square *, Square *&, int) const;
+        bool squareClickLogic(std::unordered_map<char, King*>, Square *, Square *&, int);
         static void occupiedSquareClick(Square *&, Square *&);
         static void swapSquareClick(Square *&, Square *&);
         void promotionClick(Square *);

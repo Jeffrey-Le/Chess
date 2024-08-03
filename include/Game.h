@@ -23,6 +23,8 @@ class Game {
         Game();
         ~Game();
         void openGame();
+
+        void endState(GameLogic *&, bool &);
 };
 
 #endif //CHESS_GAME_H

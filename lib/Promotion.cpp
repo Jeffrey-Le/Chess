@@ -13,6 +13,15 @@ Promotion::Promotion() {
     this->pieces.push_back(new Queen);
 }
 
+Promotion::Promotion(char const color) {
+    this->container = new sf::RectangleShape(sf::Vector2f(200.0f, 50.0f));
+
+    this->pieces.push_back(new Knight(color));
+    this->pieces.push_back(new Bishop(color));
+    this->pieces.push_back(new Rook(color));
+    this->pieces.push_back(new Queen(color));
+}
+
 Promotion::~Promotion() {
     delete this->container;
 
@@ -33,4 +42,8 @@ void Promotion::drawPromotionUI(sf::Vector2f squarePos) {
 
 sf::RectangleShape Promotion::usePromUI() {
     return *this->container;
+}
+
+std::vector<Piece *> Promotion::usePromPieces() {
+    return this->pieces;
 }

@@ -173,16 +173,18 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
     if (this->enPeasant) {
         Bitboard *opposingPawn = (this->playerTurn) ? this->bitBoards[-1.0f] : this->bitBoards[1.0f];
 
-        int capIndex = 0;
+        int capIndex = -1;
 
         if ((1ULL << (clickedIndex + 8)) & opposingPawn->useBitboard() && this->playerTurn)
             capIndex = clickedIndex + 8;
         else if ((1ULL << (clickedIndex - 8)) & opposingPawn->useBitboard() && !this->playerTurn)
             capIndex = clickedIndex - 8;
 
-        this->capturePiece(capIndex);
+        if (capIndex != -1) {
+            this->capturePiece(capIndex);
 
-        squares[capIndex].setOccupiedPiece(new Piece());
+            squares[capIndex].setOccupiedPiece(new Piece());
+        }
 
         this->enPeasant = false;
         this->enPeasontPos = -1;
@@ -214,6 +216,9 @@ void GameLogic::updateMoves(int const clickedIndex, int const trackedIndex) {
         this->enPeasontPos = clickedIndex;
     else
         this->enPeasontPos = -1;
+
+    // Check if on Promotion Square
+    this->moves.checkPawnPromotion(squares, clickedIndex);
 
     // Checks the Future Possible Moves for the Current Piece to See if Move Made King in Check
     this->getPossibleMoves(clickedIndex);
@@ -273,7 +278,6 @@ void GameLogic::updateBoard(Board *&board) {
                 squares[i].setValidMove(false);
         }
     }
-
 
     this->updateValidSquare();
 }

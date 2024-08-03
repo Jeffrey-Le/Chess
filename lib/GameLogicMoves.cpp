@@ -83,6 +83,7 @@ void GameLogic::getPossibleMoves(int const index) {
     if (squares[index].usePiece() == (1.0f * multiplier)) // Only Applies to Pawns
         allMoves[1] = (allMoves[1] & moves.useOpposingP());
 
+
     uint64_t comboMoves = 0ULL;
     uint64_t movesInCheck = 0ULL;
 
